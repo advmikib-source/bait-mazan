@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>קליניקה – בית מאזן בטבע</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f3ec; --card:#ffffff; --ink:#1d2a21; --muted:#56635a; --line:#d9dccf; --soft:#f1f2ec;
+  --brand:#2f6b45; --brand-soft:#e3f1e7;
+  --ok:#1f7a3f; --ok-soft:#dff3e5; --bad:#b3261e; --bad-soft:#fbe4e2; --warn:#8a5a00; --warn-soft:#fff2cf; --info:#1d3d66; --info-soft:#e7eef8;
+  --radius:16px; --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 14px rgba(0,0,0,.05);
+  --slot:20px;
+}
+*{box-sizing:border-box}
+html{font-size:18px;-webkit-text-size-adjust:100%}
+html.admin{font-size:15px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Rubik,"Segoe UI",Arial,sans-serif;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #f0b400;outline-offset:2px}
+.ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 80px}
+.admin .wrap{max-width:1280px}
+.topbar{background:var(--brand);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:30;min-height:58px}
+.topbar .logo{font-weight:700;font-size:1.05rem;flex:1;display:flex;gap:8px;align-items:center;min-width:0}
+.topbar .logo small{font-weight:400;opacity:.85}
+.live{font-size:.8rem;opacity:.9;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.live::before{content:"";width:9px;height:9px;border-radius:50%;background:#7CFC9a;box-shadow:0 0 0 3px rgba(124,252,154,.25)}
+.live.off::before{background:#ffb4a8;box-shadow:none}
+.fontbtn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:10px;min-width:46px;height:42px;font-weight:700}
+h1{font-size:1.55rem;margin:20px 0 6px}
+h2{font-size:1.25rem;margin:0 0 6px}
+h3{font-size:1.08rem;margin:0 0 8px}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin:14px 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:2px solid transparent;border-radius:12px;padding:8px 16px;min-height:44px;font-weight:500;background:#eceee6;color:var(--ink);text-decoration:none;white-space:nowrap}
+.btn:hover{filter:brightness(.96)}
+.btn.primary{background:var(--brand);color:#fff}
+.btn.ok{background:var(--ok);color:#fff}
+.btn.danger{background:var(--bad-soft);color:var(--bad);border-color:#f0b7b2}
+.btn.ghost{background:transparent;border-color:var(--line)}
+.btn.wa{background:#1fa855;color:#fff}
+.btn.sm{min-height:34px;padding:4px 11px;font-size:.9rem;border-radius:10px}
+.btn.big{min-height:60px;font-size:1.15rem;padding:10px 22px;border-radius:16px;font-weight:700}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.spacer{flex:1}
+.badge{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.82rem;font-weight:500;background:#eceee6;white-space:nowrap}
+.badge.ok{background:var(--ok-soft);color:var(--ok)}
+.badge.bad{background:var(--bad-soft);color:var(--bad)}
+.badge.warn{background:var(--warn-soft);color:var(--warn)}
+.badge.hol{background:#f3e8ff;color:#6b2fa3}
+.badge.info{background:var(--info-soft);color:var(--info)}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none}
+.notice{border-radius:12px;padding:12px 14px;margin:12px 0}
+.notice.ok{background:var(--ok-soft);color:#14512a}
+.notice.warn{background:var(--warn-soft);color:#5e3d00}
+.notice.bad{background:var(--bad-soft);color:#7d1a14}
+.notice.info{background:var(--info-soft);color:var(--info)}
+.inp{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;min-height:42px;max-width:100%}
+.inp.w{width:100%}
+label.lb{display:block;font-weight:500;margin:12px 0 5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+/* ── לשוניות מנהל ── */
+.tabs{display:flex;gap:2px;overflow-x:auto;background:#fff;border-bottom:1px solid var(--line);padding:0 8px;position:sticky;top:58px;z-index:25;scrollbar-width:thin}
+.tabs button{border:0;background:none;padding:13px 12px;border-bottom:3px solid transparent;white-space:nowrap;font-weight:500;color:var(--muted)}
+.tabs button.on{border-bottom-color:var(--brand);color:var(--ink)}
+.tabs .cnt{background:var(--bad);color:#fff;border-radius:999px;padding:0 7px;font-size:.78rem;margin-inline-start:4px}
+.datenav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:16px 0 4px}
+.datenav .title{font-size:1.3rem;font-weight:700}
+.datenav .htitle{color:var(--muted)}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.stat{background:#fff;border-radius:12px;padding:8px 14px;box-shadow:var(--shadow);min-width:120px}
+.stat b{font-size:1.4rem;display:block;line-height:1.2}
+/* ── עכשיו בקליניקה ── */
+.nowstrip{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin:10px 0}
+.nowcard{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:10px 12px;border-inline-start:6px solid #cfd3c6}
+.nowcard.busy{border-inline-start-color:var(--brand)}
+.nowcard .rn{font-weight:700}
+.nowcard .who{font-size:1.02rem}
+.nowcard .meta{font-size:.82rem;color:var(--muted)}
+/* ── לוח יומי ── */
+.daywrap{overflow:auto;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);max-height:78vh;-webkit-overflow-scrolling:touch}
+.dgrid{display:flex;min-width:max-content;position:relative}
+.tcol{flex:none;width:58px;position:sticky;right:0;z-index:6;background:#fff;border-inline-end:1px solid var(--line)}
+.rcol{flex:1 0 165px;min-width:165px;border-inline-end:1px solid #eceee6}
+.chead{position:sticky;top:0;z-index:5;background:#f7f7f2;height:44px;display:flex;align-items:center;justify-content:center;font-weight:700;border-bottom:2px solid var(--line);padding:0 6px;text-align:center;line-height:1.1}
+.tcol .chead{z-index:7}
+.cbody{position:relative;cursor:copy;
+  background-image:repeating-linear-gradient(to bottom,#e3e5dc 0,#e3e5dc 1px,transparent 1px,transparent calc(var(--slot)*4)),
+                   repeating-linear-gradient(to bottom,#f3f4ef 0,#f3f4ef 1px,transparent 1px,transparent var(--slot))}
+.tcol .cbody{cursor:default;background:none}
+.tlabel{position:absolute;right:0;left:0;text-align:center;font-size:.78rem;color:var(--muted);transform:translateY(-50%)}
+.sess{position:absolute;right:3px;left:3px;border-radius:9px;padding:3px 7px;font-size:.82rem;line-height:1.2;overflow:hidden;cursor:pointer;color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);border:1px solid rgba(0,0,0,.08)}
+.sess:hover{filter:brightness(1.08);z-index:3}
+.sess .t{font-weight:700;opacity:.95}
+.sess .p{font-weight:500}
+.sess .th{opacity:.92}
+.sess .ok{position:absolute;top:3px;left:5px;background:#fff;color:var(--ok);border-radius:50%;width:18px;height:18px;font-size:.75rem;display:flex;align-items:center;justify-content:center;font-weight:700}
+.sess .rep{opacity:.8}
+.sess.dim{opacity:.18}
+.nowline{position:absolute;right:0;left:0;height:0;border-top:2px solid #e0362b;z-index:4;pointer-events:none}
+.nowline::before{content:"";position:absolute;right:-1px;top:-6px;width:10px;height:10px;background:#e0362b;border-radius:50%}
+.slotghost{position:absolute;right:3px;left:3px;border:2px dashed var(--brand);border-radius:9px;background:rgba(47,107,69,.08);pointer-events:none;display:none;font-size:.78rem;color:var(--brand);padding:2px 6px}
+/* ── שבועי ── */
+.weekgrid{display:grid;grid-template-columns:repeat(5,minmax(170px,1fr));gap:10px;overflow-x:auto}
+.wday{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:10px;min-height:120px}
+.wday.today{outline:3px solid var(--brand)}
+.wday h3{margin:0;cursor:pointer}
+.wday .h{font-size:.8rem;color:var(--muted);margin-bottom:6px}
+.chip{display:block;width:100%;text-align:start;border:1px solid var(--line);border-inline-start:5px solid var(--c,#999);background:#fff;border-radius:10px;padding:5px 8px;margin:5px 0;font-size:.85rem;line-height:1.25}
+.chip:hover{background:#f8f9f4}
+.chip b{font-weight:700}
+.chip .s{color:var(--muted)}
+/* ── רשימות ── */
+.lrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid #eef0e8}
+.lrow:last-child{border-bottom:0}
+.lrow .nm{font-weight:700;min-width:150px}
+.lrow.off{opacity:.55}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th,.tbl td{padding:7px 8px;border-bottom:1px solid #eef0e8;text-align:start;vertical-align:middle}
+.tbl th{font-size:.85rem;color:var(--muted);font-weight:500}
+.linkbox{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#f6f7f1;border:1px dashed #bfc5b5;border-radius:12px;padding:10px;word-break:break-all;font-size:.85rem;direction:ltr;text-align:left}
+.msgprev{white-space:pre-wrap;background:#e7fbe9;border-radius:12px;padding:12px;font-size:.95rem;border:1px solid #c5ebcb;max-height:50vh;overflow:auto}
+details>summary{cursor:pointer;font-weight:500;padding:6px 0}
+/* ── מסך מטפל ── */
+.daycard{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin:14px 0}
+.daycard.today{border:3px solid var(--brand)}
+.daycard .dh{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;margin-bottom:6px}
+.daycard .dh b{font-size:1.15rem}
+.tsess{display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid #eef0e8;flex-wrap:wrap}
+.tsess:first-of-type{border-top:0}
+.tsess .tm{flex:none;width:86px;text-align:center;border-radius:12px;background:var(--soft);padding:6px 4px}
+.tsess .tm b{display:block;font-size:1.35rem;line-height:1.1}
+.tsess .tm span{font-size:.82rem;color:var(--muted)}
+.tsess .inf{flex:1;min-width:150px}
+.tsess .inf .pt{font-weight:700;font-size:1.15rem}
+.roomtag{display:inline-block;background:var(--brand-soft);color:var(--brand);border-radius:10px;padding:2px 10px;font-weight:700}
+.tsess.now{background:#f2fbf4;border-radius:12px;padding:12px 8px}
+.docbtn{width:100%;min-height:54px;border-radius:14px;border:3px solid var(--brand);background:#fff;color:var(--brand);font-weight:700;font-size:1.05rem}
+.docbtn.done{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.pendcard{background:var(--bad-soft);border:2px solid #f0b7b2;border-radius:var(--radius);padding:14px;margin:14px 0}
+.pendcard h2{color:var(--bad)}
+.pendcard .tsess{border-top-color:#f3cfcb}
+/* ── חלון קופץ / הודעות ── */
+.overlay{position:fixed;inset:0;background:rgba(20,30,24,.45);z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:4vh 12px;overflow-y:auto}
+.modal{background:#fff;border-radius:18px;max-width:600px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:20px;position:relative}
+.modal .x{position:absolute;top:10px;left:10px;border:0;background:#f1f2ec;border-radius:50%;width:40px;height:40px;font-size:1.2rem}
+.modal h2{padding-left:44px}
+.modal .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+#busy{position:fixed;inset:0;background:rgba(255,255,255,.5);z-index:200;display:none;align-items:center;justify-content:center}
+#busy.on{display:flex}
+#busy .sp{background:#fff;border-radius:16px;padding:16px 24px;box-shadow:var(--shadow);font-size:1.05rem;display:flex;gap:12px;align-items:center}
+#busy .sp::before{content:"";width:24px;height:24px;border-radius:50%;border:4px solid var(--brand-soft);border-top-color:var(--brand);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1d2a21;color:#fff;padding:12px 20px;border-radius:12px;z-index:150;opacity:0;pointer-events:none;transition:opacity .25s;max-width:90vw;text-align:center}
+#toast.on{opacity:1}
+.empty{text-align:center;padding:30px 10px;color:var(--muted)}
+.center{text-align:center;padding:50px 16px}
+.center .ic{font-size:4rem}
+@media (max-width:640px){
+  .grid2{grid-template-columns:1fr}
+  h1{font-size:1.35rem}
+  .datenav .title{font-size:1.1rem}
+  .rcol{flex-basis:140px;min-width:140px}
+  .weekgrid{grid-template-columns:1fr}
+  .live span{display:none}
+}
+@media print{
+  @page{size:A4 landscape;margin:8mm}
+  html.admin{font-size:10px}
+  body{background:#fff}
+  .topbar,.tabs,.noprint,#toast,#busy,.nowstrip{display:none!important}
+  .daywrap{max-height:none;overflow:visible;box-shadow:none}
+  .chead{position:static}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="busy"><div class="sp">רגע…</div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+var API_URL = 'https://script.google.com/macros/s/AKfycbyhb8y0AK9Z-WSWSA_2-kmMPZQ52KsmYQbPwfKqLF8KZ_U53UxVUArk-VpO7sIIJ1Y7/exec';
+// סביבת פיתוח מקומית: כשהדף נטען בתוך סביבת הבדיקה, ה-API מגיע ממנה
+try { if (API_URL.indexOf('__') === 0 && window.parent !== window && window.parent.__DEV) window.DEV = window.parent.__DEV; } catch (e) {}
+</script>
+<script>
+(function () {
+'use strict';
+var BOOT = null;
+var $app = document.getElementById('app');
+
+/* ═════════════ כלים כלליים ═════════════ */
+function el(tag, attrs) {
+  var n = document.createElement(tag);
+  if (attrs) Object.keys(attrs).forEach(function (k) {
+    var v = attrs[k];
+    if (v === null || v === undefined || v === false) return;
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else if (k === 'style' && typeof v === 'object') Object.keys(v).forEach(function (s) { n.style.setProperty(s, v[s]); });
+    else if (k.slice(0, 2) === 'on') n.addEventListener(k.slice(2), v);
+    else if (k === 'value') n.value = v;
+    else if (v === true) { n.setAttribute(k, ''); try { n[k] = true; } catch (e) {} }
+    else n.setAttribute(k, v);
+  });
+  for (var i = 2; i < arguments.length; i++) put(n, arguments[i]);
+  return n;
+}
+function put(n, c) {
+  if (c === null || c === undefined || c === false) return;
+  if (Array.isArray(c)) { c.forEach(function (x) { put(n, x); }); return; }
+  n.appendChild(typeof c === 'object' ? c : document.createTextNode(String(c)));
+}
+function clear(n) { while (n.firstChild) n.removeChild(n.firstChild); return n; }
+function ls(k, v) {
+  try {
+    if (v === undefined) return JSON.parse(localStorage.getItem('bmc_' + k) || 'null');
+    if (v === null) localStorage.removeItem('bmc_' + k); else localStorage.setItem('bmc_' + k, JSON.stringify(v));
+  } catch (e) { return null; }
+}
+var busyN = 0;
+function busy(on, text) {
+  busyN += on ? 1 : -1; if (busyN < 0) busyN = 0;
+  var b = document.getElementById('busy');
+  b.querySelector('.sp').textContent = text || 'רגע…';
+  b.classList.toggle('on', busyN > 0);
+}
+var toastT;
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 3200);
+}
+function call(action, payload) {
+  if (window.DEV) return window.DEV.call(action, BOOT && BOOT.auth || '', payload || {});
+  return fetch(API_URL, {
+    method: 'POST', credentials: 'omit', redirect: 'follow',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: action, auth: BOOT && BOOT.auth || '', payload: payload || {} })
+  }).then(function (res) { return res.json(); }, function () {
+    throw new Error('אין חיבור לשרת. בדקו את החיבור לאינטרנט ונסו שוב.');
+  }).then(function (r) {
+    if (r && r.ok) return r.data;
+    throw new Error((r && r.error) || 'אירעה תקלה');
+  });
+}
+/** קריאה עם חיווי טעינה והודעת שגיאה. מחזיר null בשגיאה. */
+function run(action, payload, text) {
+  busy(true, text);
+  return call(action, payload).then(function (d) { busy(false); return d; }, function (e) {
+    busy(false); alertBox(e.message); return null;
+  });
+}
+var openModals = 0;
+function modal(title, body, actions, opts) {
+  opts = opts || {};
+  var ov = el('div', { class: 'overlay', role: 'dialog', 'aria-modal': 'true' });
+  var closed = false;
+  var close = function () {
+    if (closed) return; closed = true; openModals--;
+    if (ov.parentNode) ov.parentNode.removeChild(ov);
+    document.removeEventListener('keydown', onKey);
+    if (opts.onClose) opts.onClose();
+  };
+  var onKey = function (e) { if (e.key === 'Escape') close(); };
+  var m = el('div', { class: 'modal' },
+    el('button', { class: 'x', 'aria-label': 'סגירה', onclick: close }, '✕'),
+    title ? el('h2', { text: title }) : null, body,
+    actions && actions.length ? el('div', { class: 'acts' }, actions.map(function (a) {
+      return el('button', { class: 'btn ' + (a.cls || ''), onclick: function () {
+        var r = a.fn ? a.fn() : undefined;
+        if (r === false) return;
+        if (r && r.then) { r.then(function (v) { if (v !== false) close(); }); return; }
+        close();
+      } }, a.label);
+    })) : null);
+  ov.appendChild(m);
+  ov.addEventListener('mousedown', function (e) { if (e.target === ov) close(); });
+  document.addEventListener('keydown', onKey);
+  document.body.appendChild(ov); openModals++;
+  if (!opts.noFocus) { var f = m.querySelector('input,select') || m.querySelector('.acts .btn'); if (f) f.focus(); }
+  return close;
+}
+function alertBox(msg) { modal('שימו לב', el('p', { style: 'font-size:1.08rem;white-space:pre-line', text: msg }), [{ label: 'הבנתי', cls: 'primary' }]); }
+function confirmBox(title, msg, okLabel, okCls) {
+  return new Promise(function (res) {
+    var done = false;
+    modal(title, el('p', { style: 'font-size:1.05rem;white-space:pre-line', text: msg }), [
+      { label: okLabel || 'אישור', cls: okCls || 'primary', fn: function () { done = true; res(true); } },
+      { label: 'ביטול', cls: 'ghost' }
+    ], { onClose: function () { if (!done) res(false); } });
+  });
+}
+function copyText(txt) {
+  var ok = function () { toast('הועתק ✓'); };
+  var fallback = function () {
+    var ta = el('textarea', { style: 'position:fixed;top:-1000px' }); ta.value = txt; document.body.appendChild(ta); ta.select();
+    var good = false; try { good = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    if (good) ok(); else modal('העתקה', el('textarea', { class: 'inp w', rows: 8, value: txt, readonly: true }), [{ label: 'סגירה' }]);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, fallback); else fallback();
+}
+function waUrl(phone, text) {
+  var d = String(phone || '').replace(/\D/g, '');
+  if (d.charAt(0) === '0') d = '972' + d.slice(1);
+  return 'https://wa.me/' + d + '?text=' + encodeURIComponent(text);
+}
+function openWa(phone, text) { window.open(waUrl(phone, text), '_blank', 'noopener'); }
+function ltr(t) { return el('span', { class: 'ltr', text: t }); }
+
+/* ═════════════ תאריכים: לועזי + עברי + חגים ═════════════ */
+var DAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+var DAYS_S = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'];
+var GM = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
+var HM = { Tishri: 'תשרי', Tishrei: 'תשרי', Heshvan: 'חשוון', Cheshvan: 'חשוון', Marcheshvan: 'חשוון', Kislev: 'כסלו', Tevet: 'טבת', Shevat: 'שבט',
+  'Adar I': 'אדר א׳', 'Adar II': 'אדר ב׳', Adar: 'אדר', Nisan: 'ניסן', Iyar: 'אייר', Sivan: 'סיוון', Tamuz: 'תמוז', Tammuz: 'תמוז', Av: 'אב', Elul: 'אלול' };
+var HFMT = null;
+try { HFMT = new Intl.DateTimeFormat('en-u-ca-hebrew', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }); } catch (e) {}
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+function D(ds) { return new Date(Date.UTC(+ds.slice(0, 4), +ds.slice(5, 7) - 1, +ds.slice(8, 10))); }
+function addDays(ds, n) { var d = D(ds); d.setUTCDate(d.getUTCDate() + n); return d.getUTCFullYear() + '-' + pad2(d.getUTCMonth() + 1) + '-' + pad2(d.getUTCDate()); }
+function dow(ds) { return D(ds).getUTCDay(); }
+function isWork(ds) { return dow(ds) <= 4; }
+function nextWork(ds, dir) { var d = addDays(ds, dir); while (!isWork(d)) d = addDays(d, dir); return d; }
+function workOrNext(ds) { return isWork(ds) ? ds : nextWork(ds, 1); }
+function weekStart(ds) { return addDays(ds, -dow(ds)); }
+function localToday() { var d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+function localNowMin() { var d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+function gDate(ds) { return (+ds.slice(8, 10)) + ' ב' + GM[+ds.slice(5, 7) - 1] + ' ' + ds.slice(0, 4); }
+function gShort(ds) { return (+ds.slice(8, 10)) + '.' + (+ds.slice(5, 7)); }
+function gem(n) {
+  var T = [[400, 'ת'], [300, 'ש'], [200, 'ר'], [100, 'ק'], [90, 'צ'], [80, 'פ'], [70, 'ע'], [60, 'ס'], [50, 'נ'], [40, 'מ'], [30, 'ל'], [20, 'כ'], [10, 'י'], [9, 'ט'], [8, 'ח'], [7, 'ז'], [6, 'ו'], [5, 'ה'], [4, 'ד'], [3, 'ג'], [2, 'ב'], [1, 'א']];
+  var s = '';
+  T.forEach(function (p) { while (n >= p[0]) { s += p[1]; n -= p[0]; } });
+  s = s.replace(/יה$/, 'טו').replace(/יו$/, 'טז');
+  return s.length === 1 ? s + '׳' : s.slice(0, -1) + '״' + s.slice(-1);
+}
+var HC = {};
+function hp(ds) {
+  if (HC[ds]) return HC[ds];
+  var o = { d: 0, m: '', y: 0 };
+  if (HFMT) { try { HFMT.formatToParts(D(ds)).forEach(function (p) { if (p.type === 'day') o.d = +p.value; else if (p.type === 'month') o.m = p.value; else if (p.type === 'year' || p.type === 'relatedYear') o.y = +p.value; }); } catch (e) {} }
+  return (HC[ds] = o);
+}
+function hDate(ds) { var p = hp(ds); return p.d ? gem(p.d) + ' ב' + (HM[p.m] || p.m) : ''; }
+function hFull(ds) { var p = hp(ds); return p.d ? hDate(ds) + ' ' + gem(p.y % 1000) : ''; }
+function mod7(x) { return ((x % 7) + 7) % 7; }
+function holiday(ds) {
+  var p = hp(ds); if (!p.d) return '';
+  var d = p.d, m = p.m, w = dow(ds);
+  if (m === 'Tishri' || m === 'Tishrei') {
+    if (d === 1 || d === 2) return 'ראש השנה';
+    if ((d === 3 && w !== 6) || (d === 4 && w === 0)) return 'צום גדליה';
+    if (d === 9) return 'ערב יום כיפור'; if (d === 10) return 'יום כיפור';
+    if (d === 14) return 'ערב סוכות'; if (d === 15) return 'סוכות';
+    if (d >= 16 && d <= 20) return 'חול המועד סוכות';
+    if (d === 21) return 'הושענא רבה'; if (d === 22) return 'שמחת תורה';
+  }
+  for (var k = 0; k < 8; k++) { var q = hp(addDays(ds, -k)); if (q.m === 'Kislev' && q.d === 25) return 'חנוכה – נר ' + gem(k + 1); }
+  if (m === 'Tevet' && d === 10) return 'עשרה בטבת';
+  if (m === 'Shevat' && d === 15) return 'ט״ו בשבט';
+  if (m === 'Adar' || m === 'Adar II') { if (d === 13) return 'תענית אסתר'; if (d === 14) return 'פורים'; if (d === 15) return 'שושן פורים'; }
+  if (m === 'Nisan') {
+    if (d === 14) return 'ערב פסח'; if (d === 15) return 'פסח';
+    if (d >= 16 && d <= 20) return 'חול המועד פסח'; if (d === 21) return 'שביעי של פסח';
+    if (d >= 26 && d <= 28) { var w27 = mod7(w + 27 - d), t = w27 === 5 ? 26 : (w27 === 0 ? 28 : 27); if (d === t) return 'יום השואה'; }
+  }
+  if (m === 'Iyar') {
+    var w5 = mod7(w + 5 - d), at = w5 === 5 ? 4 : (w5 === 6 ? 3 : (w5 === 1 ? 6 : 5));
+    if (d === at - 1) return 'יום הזיכרון'; if (d === at) return 'יום העצמאות';
+    if (d === 18) return 'ל״ג בעומר'; if (d === 28) return 'יום ירושלים';
+  }
+  if (m === 'Sivan') { if (d === 5) return 'ערב שבועות'; if (d === 6) return 'שבועות'; }
+  if (m === 'Tamuz' || m === 'Tammuz') { if ((d === 17 && w !== 6) || (d === 18 && w === 0)) return 'י״ז בתמוז'; }
+  if (m === 'Av') { if ((d === 9 && w !== 6) || (d === 10 && w === 0)) return 'תשעה באב'; }
+  if (m === 'Elul' && d === 29) return 'ערב ראש השנה';
+  return '';
+}
+function dayName(ds) { return 'יום ' + DAYS[dow(ds)]; }
+function dayLong(ds) { return dayName(ds) + ', ' + gDate(ds); }
+function toMin(t) { var m = /^(\d{1,2}):(\d{2})$/.exec(t || ''); return m ? +m[1] * 60 + +m[2] : NaN; }
+function fromMin(n) { return pad2(Math.floor(n / 60)) + ':' + pad2(n % 60); }
+function durTxt(min) { var h = Math.floor(min / 60), m = min % 60; return (h ? h + ' ש׳' : '') + (h && m ? ' ' : '') + (m ? m + ' ד׳' : ''); }
+function stamp(iso) { if (!iso) return ''; return gShort(iso.slice(0, 10)) + ' ' + iso.slice(11, 16); }
+function relDay(ds, today) {
+  if (ds === today) return 'היום';
+  if (ds === addDays(today, 1)) return 'מחר';
+  if (ds === addDays(today, -1)) return 'אתמול';
+  return '';
+}
+function shortName(full) {
+  var w = String(full || '').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+  if (w.length < 2) return w[0] || '';
+  return w[0] + ' ' + w[w.length - 1].charAt(0) + '.';
+}
+function firstName(full) { return String(full || '').trim().split(/\s+/)[0] || ''; }
+
+/* ═════════════ גודל גופן ═════════════ */
+function applyFont() { var f = ls('font') || 18; document.documentElement.style.fontSize = f + 'px'; }
+function fontButtons() {
+  var set = function (d) { var f = (ls('font') || 18) + d; f = Math.max(15, Math.min(26, f)); ls('font', f); applyFont(); };
+  return [el('button', { class: 'fontbtn', 'aria-label': 'הגדלת הכתב', onclick: function () { set(2); } }, 'א+'),
+          el('button', { class: 'fontbtn', 'aria-label': 'הקטנת הכתב', onclick: function () { set(-2); } }, 'א-')];
+}
+function liveTag() { return el('div', { class: 'live', id: 'live' }, el('span', { text: 'מתעדכן בזמן אמת' })); }
+function setLive(ok, when) {
+  var n = document.getElementById('live'); if (!n) return;
+  n.classList.toggle('off', !ok);
+  n.firstChild.textContent = ok ? 'עודכן ' + when : 'אין חיבור – מנסה שוב';
+}
+function hhmm() { var d = new Date(); return pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
+function topbar(sub, extra) {
+  return el('div', { class: 'topbar' }, el('div', { class: 'logo' }, '🌿 בית מאזן בטבע', el('small', { text: '· ' + sub })), extra);
+}
+function baseUrl() { return location.origin + location.pathname; }
+
+/* ═══════════════════════════════════════════════
+   מסך מטפל
+   ═══════════════════════════════════════════════ */
+var TV = { data: null, sig: '' };
+function therapistStart() {
+  applyFont();
+  call('thView').then(function (d) { TV.data = d; TV.sig = JSON.stringify(d); renderTherapist(); setLive(true, hhmm()); }, function (e) {
+    clear($app);
+    put($app, [topbar('טיפולים'), el('div', { class: 'wrap' }, el('div', { class: 'center' }, el('div', { class: 'ic', text: '🔒' }), el('h1', { text: e.message })))]);
+  });
+  setInterval(therapistPoll, 40000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) therapistPoll(); });
+}
+function therapistPoll() {
+  if (document.hidden || openModals) return;
+  call('thView').then(function (d) {
+    var sig = JSON.stringify(d);
+    if (sig !== TV.sig) {
+      var changed = TV.data && JSON.stringify(TV.data.upcoming) !== JSON.stringify(d.upcoming);
+      TV.data = d; TV.sig = sig;
+      var y = window.scrollY; renderTherapist(); window.scrollTo(0, y);
+      if (changed) toast('🔄 השיבוץ שלך עודכן');
+    }
+    setLive(true, hhmm());
+  }, function () { setLive(false); });
+}
+function thSetDoc(s, done) {
+  run('thSetDoc', { id: s.id, done: done }, done ? 'מסמן…' : 'מבטל…').then(function (d) {
+    if (!d) return;
+    TV.data = d; TV.sig = JSON.stringify(d);
+    var y = window.scrollY; renderTherapist(); window.scrollTo(0, y);
+    toast(done ? '✓ תודה! הסיכום סומן' : 'הסימון בוטל');
+  });
+}
+function thSessionRow(s, opts) {
+  var today = TV.data.today, nowMin = localToday() === today ? localNowMin() : -1;
+  var isNow = s.date === today && toMin(s.start) <= nowMin && nowMin < toMin(s.end);
+  var canDoc = s.date <= today;
+  return el('div', { class: 'tsess' + (isNow ? ' now' : '') },
+    el('div', { class: 'tm' }, el('b', {}, ltr(s.start)), el('span', {}, 'עד ', ltr(s.end))),
+    el('div', { class: 'inf' },
+      opts && opts.showDate ? el('div', { class: 'muted small', text: dayName(s.date) + ' ' + gShort(s.date) }) : null,
+      el('div', { class: 'pt', text: s.patient }),
+      el('div', {}, el('span', { class: 'roomtag', text: '🚪 ' + s.room }), isNow ? el('span', { class: 'badge ok', style: 'margin-inline-start:8px', text: 'עכשיו' }) : null)),
+    canDoc ? el('div', { style: 'width:100%' },
+      s.doc ? el('div', { class: 'row' },
+        el('button', { class: 'docbtn done', style: 'flex:1', disabled: true }, '✓ הסיכום נרשם בקליקס'),
+        el('button', { class: 'btn ghost sm', onclick: function () { thSetDoc(s, false); } }, 'ביטול'))
+      : el('button', { class: 'docbtn', onclick: function () { thSetDoc(s, true); } }, '☐ רשמתי סיכום בקליקס – לסמן'))
+    : null);
+}
+function renderTherapist() {
+  var d = TV.data;
+  clear($app);
+  var w = el('div', { class: 'wrap' });
+  put($app, [topbar('הטיפולים שלי', [liveTag()].concat(fontButtons())), w]);
+  put(w, el('h1', { text: 'שלום ' + d.firstName + ' 👋' }));
+  put(w, el('p', { class: 'muted', style: 'margin-top:0', text: 'כאן מופיעים הטיפולים שלך – יום, שעה, חדר ומטופל. הדף מתעדכן אוטומטית בכל שינוי.' }));
+
+  if (d.pending.length) {
+    var LIM = 3, showAll = TV.showAll || d.pending.length <= LIM + 1;
+    put(w, el('div', { class: 'pendcard' },
+      el('h2', { text: '⏰ סיכומים שטרם סומנו (' + d.pending.length + ')' }),
+      el('p', { class: 'small', style: 'margin:0 0 6px', text: 'אחרי שכתבת את הסיכום בקליקס – לחצ/י על הכפתור ליד הטיפול.' }),
+      (showAll ? d.pending : d.pending.slice(0, LIM)).map(function (s) { return thSessionRow(s, { showDate: true }); }),
+      showAll ? null : el('button', { class: 'btn ghost', style: 'width:100%;margin-top:6px', onclick: function () { TV.showAll = true; renderTherapist(); } }, 'הצגת כל ' + d.pending.length + ' הסיכומים החסרים')));
+  }
+
+  var byDate = {};
+  d.upcoming.forEach(function (s) { (byDate[s.date] = byDate[s.date] || []).push(s); });
+  var dates = Object.keys(byDate).sort();
+  if (!dates.length) put(w, el('div', { class: 'card empty' }, el('div', { style: 'font-size:2.5rem', text: '📭' }), 'אין טיפולים משובצים בשבועיים הקרובים.'));
+  if (dates.length && dates[0] !== d.today && isWork(d.today)) put(w, el('div', { class: 'notice info', text: 'אין לך טיפולים היום.' }));
+  dates.forEach(function (ds) {
+    var rel = relDay(ds, d.today), hol = holiday(ds), list = byDate[ds];
+    var total = list.reduce(function (a, s) { return a + toMin(s.end) - toMin(s.start); }, 0);
+    var done = list.filter(function (s) { return s.doc; }).length;
+    put(w, el('div', { class: 'daycard' + (ds === d.today ? ' today' : '') },
+      el('div', { class: 'dh' },
+        rel ? el('span', { class: 'badge ' + (ds === d.today ? 'ok' : 'info'), text: rel }) : null,
+        el('b', { text: dayLong(ds) }), el('span', { class: 'muted', text: hFull(ds) }),
+        hol ? el('span', { class: 'badge hol', text: hol }) : null),
+      el('div', { class: 'muted small', text: list.length + ' טיפולים · ' + durTxt(total) + (ds <= d.today ? ' · סיכומים: ' + done + '/' + list.length : '') }),
+      list.map(function (s) { return thSessionRow(s); })));
+  });
+  if (d.recentDone.length) {
+    put(w, el('details', { class: 'card' }, el('summary', { text: '✓ סיכומים שסומנו בשבוע האחרון (' + d.recentDone.length + ')' }),
+      d.recentDone.map(function (s) {
+        return el('div', { class: 'lrow' }, el('span', { text: dayName(s.date) + ' ' + gShort(s.date) }), ltr(s.start), el('b', { text: s.patient }),
+          el('span', { class: 'muted', text: s.room }), el('span', { class: 'spacer' }),
+          el('button', { class: 'btn ghost sm', onclick: function () { thSetDoc(s, false); } }, 'ביטול סימון'));
+      })));
+  }
+  put(w, el('p', { class: 'muted small', style: 'text-align:center;margin-top:30px', text: 'שמרו את הקישור הזה – הוא אישי. לשאלות פנו למנהל הקליניקה.' }));
+}
+
+/* ═══════════════════════════════════════════════
+   מסך מנהל
+   ═══════════════════════════════════════════════ */
+var A = { tab: 'day', date: '', weekStart: '', sendDate: '', thFilter: '', therapists: [], rooms: [], settings: {}, patients: [], patientsError: '', sessions: {}, view: null };
+var TABS = [['day', '🗓️ לוח יומי'], ['week', '📅 שבועי'], ['send', '📲 שליחה למטפלים'], ['docs', '📝 מעקב סיכומים'],
+  ['therapists', '👥 מטפלים'], ['rooms', '🚪 חדרים'], ['patients', '🧑 מטופלים'], ['settings', '⚙️ הגדרות']];
+
+function adminStart() {
+  document.documentElement.classList.add('admin');
+  var t0 = localToday();
+  A.date = workOrNext(localNowMin() >= 20 * 60 ? addDays(t0, 1) : t0);
+  A.weekStart = weekStart(A.date);
+  A.sendDate = A.date;
+  A.tab = ls('tab') || 'day';
+  run('adminBoot', {}, 'טוען…').then(function (d) {
+    if (!d) return;
+    applyBoot(d);
+    renderAdmin();
+    loadPatients(true);
+    loadDocsCount();
+  });
+  setInterval(adminPoll, 60000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) adminPoll(); });
+}
+function applyBoot(d) {
+  A.therapists = d.therapists; A.rooms = d.rooms; A.settings = d.settings; A.serverToday = d.today;
+}
+function TH(id) { for (var i = 0; i < A.therapists.length; i++) if (A.therapists[i].id === id) return A.therapists[i]; return null; }
+function ROOM(id) { for (var i = 0; i < A.rooms.length; i++) if (A.rooms[i].id === id) return A.rooms[i]; return null; }
+function activeTh() { return A.therapists.filter(function (t) { return t.status === 'active'; }).sort(function (a, b) { return a.name < b.name ? -1 : 1; }); }
+function activeRooms() { return A.rooms.filter(function (r) { return r.status === 'active'; }); }
+function thLink(t) { return baseUrl() + '?t=' + t.token; }
+
+function adminPoll() {
+  if (document.hidden || openModals || busyN) return;
+  call('adminBoot').then(function (d) {
+    applyBoot(d);
+    setLive(true, hhmm());
+    if (A.tab === 'day' || A.tab === 'week' || A.tab === 'send' || A.tab === 'docs') renderTab(true);
+    loadDocsCount();
+  }, function () { setLive(false); });
+}
+var docsCount = 0;
+function loadDocsCount() {
+  call('adminDocs').then(function (d) { docsCount = d.pending.length; var c = document.getElementById('docscnt'); if (c) { c.textContent = docsCount; c.style.display = docsCount ? '' : 'none'; } }, function () {});
+}
+function loadPatients(silent) {
+  var p = silent ? call('adminPatients') : run('adminPatients', {}, 'טוען מטופלים…');
+  return p.then(function (d) { if (d) { A.patients = d.patients; A.patientsError = d.error; A.sheetCount = d.sheetCount; } return d; }, function () { return null; });
+}
+
+function renderAdmin() {
+  clear($app);
+  var tabs = el('div', { class: 'tabs noprint', role: 'tablist' });
+  TABS.forEach(function (t) {
+    put(tabs, el('button', { class: A.tab === t[0] ? 'on' : '', role: 'tab', onclick: function () { A.tab = t[0]; ls('tab', t[0]); renderAdmin(); } },
+      t[1], t[0] === 'docs' ? el('span', { class: 'cnt', id: 'docscnt', style: docsCount ? '' : 'display:none', text: String(docsCount) }) : null));
+  });
+  put($app, [topbar('ניהול קליניקה', [liveTag()]), tabs, el('div', { class: 'wrap', id: 'body' })]);
+  setLive(true, hhmm());
+  renderTab(false);
+}
+function renderTab(silent) {
+  var body = document.getElementById('body'); if (!body) return;
+  var f = { day: tabDay, week: tabWeek, send: tabSend, docs: tabDocs, therapists: tabTherapists, rooms: tabRooms, patients: tabPatients, settings: tabSettings }[A.tab] || tabDay;
+  f(body, silent);
+}
+function fetchRange(from, to, silent) {
+  return (silent ? call('adminRange', { from: from, to: to }).then(null, function () { return null; }) : run('adminRange', { from: from, to: to }, 'טוען…'));
+}
+function setupNotice(body) {
+  var miss = [];
+  if (!activeRooms().length) miss.push(['🚪 להגדיר חדרי טיפול (שם / כינוי לכל חדר)', 'rooms']);
+  if (!activeTh().length) miss.push(['👥 לרשום מטפלים (שם מלא + נייד)', 'therapists']);
+  if (!miss.length) return false;
+  put(body, el('div', { class: 'card' }, el('h2', { text: 'ברוכים הבאים! שני צעדים לפני שמתחילים:' }),
+    miss.map(function (m) { return el('div', { class: 'lrow' }, el('span', { text: m[0] }), el('span', { class: 'spacer' }),
+      el('button', { class: 'btn primary sm', onclick: function () { A.tab = m[1]; ls('tab', m[1]); renderAdmin(); } }, 'למעבר')); })));
+  return true;
+}
+
+/* ───────── לוח יומי ───────── */
+function dateNav(ds, onGo, opts) {
+  opts = opts || {};
+  var today = localToday(), hol = holiday(ds), rel = relDay(ds, today);
+  var di = el('input', { type: 'date', class: 'inp', value: ds, 'aria-label': 'בחירת תאריך', onchange: function (e) { if (e.target.value) onGo(workOrNext(e.target.value)); } });
+  return el('div', { class: 'datenav noprint' },
+    el('button', { class: 'btn ghost sm', 'aria-label': 'יום קודם', onclick: function () { onGo(nextWork(ds, -1)); } }, '→'),
+    el('button', { class: 'btn ghost sm', onclick: function () { onGo(workOrNext(today)); } }, 'היום'),
+    el('button', { class: 'btn ghost sm', 'aria-label': 'יום הבא', onclick: function () { onGo(nextWork(ds, 1)); } }, '←'),
+    di,
+    el('div', {}, el('div', { class: 'title' }, rel ? rel + ' · ' : '', dayLong(ds)),
+      el('div', { class: 'htitle' }, hFull(ds), hol ? el('span', { class: 'badge hol', style: 'margin-inline-start:8px', text: hol }) : null)),
+    el('span', { class: 'spacer' }), opts.extra);
+}
+function tabDay(body, silent) {
+  var ds = A.date;
+  fetchRange(ds, ds, silent).then(function (d) {
+    if (!d) return;
+    if (A.tab !== 'day' || A.date !== ds) return;
+    A.view = d.sessions;
+    var sx = 0, sy = 0, dw = body.querySelector('.daywrap'); if (dw) { sx = dw.scrollLeft; sy = dw.scrollTop; }
+    var wy = window.scrollY;
+    clear(body);
+    drawDay(body, ds, d.sessions);
+    var dw2 = body.querySelector('.daywrap');
+    if (dw2) {
+      if (silent) { dw2.scrollLeft = sx; dw2.scrollTop = sy; window.scrollTo(0, wy); }
+      else if (ds === localToday()) { var nm = localNowMin(); if (nm > 9 * 60) dw2.scrollTop = Math.max(0, (nm - 480 - 60) / 15 * 20); }
+    }
+  });
+}
+function drawDay(body, ds, sessions) {
+  var go = function (d2) { A.date = d2; tabDay(body, false); };
+  var thSel = el('select', { class: 'inp', 'aria-label': 'סינון לפי מטפל', onchange: function (e) { A.thFilter = e.target.value; clear(body); drawDay(body, ds, sessions); } },
+    el('option', { value: '', text: 'כל המטפלים' }), activeTh().map(function (t) { return el('option', { value: t.id, text: t.name, selected: A.thFilter === t.id }); }));
+  put(body, dateNav(ds, go, { extra: el('div', { class: 'row' }, thSel,
+    el('button', { class: 'btn primary', onclick: function () { sessionDialog(null, { date: ds }); } }, '➕ טיפול חדש'),
+    el('button', { class: 'btn ghost', onclick: function () { window.print(); } }, '🖨️')) }));
+  if (setupNotice(body)) return;
+
+  var rooms = activeRooms();
+  // חדרים שהוסרו אך יש בהם טיפולים ביום זה
+  sessions.forEach(function (s) { if (!rooms.some(function (r) { return r.id === s.roomId; })) { var r = ROOM(s.roomId); if (r) rooms.push(r); } });
+  var today = localToday(), nowMin = localNowMin(), isToday = ds === today;
+  var thSet = {};
+  sessions.forEach(function (s) { thSet[s.therapistId] = 1; });
+  var mins = sessions.reduce(function (a, s) { return a + toMin(s.end) - toMin(s.start); }, 0);
+  var cap = rooms.length * 12 * 60;
+  var docDone = sessions.filter(function (s) { return s.doc; }).length;
+  put(body, el('div', { class: 'stats' },
+    el('div', { class: 'stat' }, el('b', { text: sessions.length }), 'טיפולים'),
+    el('div', { class: 'stat' }, el('b', { text: Object.keys(thSet).length }), 'מטפלים עובדים'),
+    el('div', { class: 'stat' }, el('b', { text: (cap ? Math.round(mins / cap * 100) : 0) + '%' }), 'תפוסת חדרים'),
+    ds <= today ? el('div', { class: 'stat' }, el('b', { text: docDone + '/' + sessions.length }), 'סיכומים סומנו') : null));
+
+  if (isToday) {
+    var strip = el('div', { class: 'nowstrip' });
+    rooms.forEach(function (r) {
+      var cur = null, next = null;
+      sessions.forEach(function (s) {
+        if (s.roomId !== r.id) return;
+        if (toMin(s.start) <= nowMin && nowMin < toMin(s.end)) cur = s;
+        else if (toMin(s.start) > nowMin && (!next || s.start < next.start)) next = s;
+      });
+      var t = cur && TH(cur.therapistId);
+      put(strip, el('div', { class: 'nowcard' + (cur ? ' busy' : ''), style: cur && t ? { 'border-inline-start-color': t.color } : null },
+        el('div', { class: 'rn', text: '🚪 ' + r.name }),
+        cur ? [el('div', { class: 'who' }, el('b', { text: t ? t.name : '?' }), ' עם ', cur.patient), el('div', { class: 'meta' }, 'עד ', ltr(cur.end))]
+            : el('div', { class: 'who muted', text: 'פנוי עכשיו' }),
+        next ? el('div', { class: 'meta' }, 'הבא: ', ltr(next.start), ' · ' + ((TH(next.therapistId) || {}).name || '')) : null));
+    });
+    put(body, el('h3', { style: 'margin-top:14px', text: '🟢 עכשיו בקליניקה · ' + hhmm() }));
+    put(body, strip);
+  }
+
+  var SLOT = 20, H = 48 * SLOT;
+  var grid = el('div', { class: 'dgrid' });
+  var tcol = el('div', { class: 'tcol' }, el('div', { class: 'chead', text: 'שעה' }));
+  var tb = el('div', { class: 'cbody', style: 'height:' + H + 'px' });
+  for (var h = 8; h <= 20; h++) put(tb, el('div', { class: 'tlabel', style: 'top:' + ((h - 8) * 4 * SLOT) + 'px' + (h === 8 ? ';transform:none' : h === 20 ? ';transform:translateY(-100%)' : '') }, ltr(pad2(h) + ':00')));
+  put(tcol, tb); put(grid, tcol);
+  rooms.forEach(function (r) {
+    var col = el('div', { class: 'rcol' }, el('div', { class: 'chead' }, r.name, r.status !== 'active' ? el('small', { class: 'muted', text: ' (הוסר)' }) : null));
+    var cb = el('div', { class: 'cbody', style: 'height:' + H + 'px', title: 'לחיצה על משבצת ריקה = שיבוץ טיפול חדש' });
+    var ghost = el('div', { class: 'slotghost' });
+    put(cb, ghost);
+    var slotAt = function (e) {
+      var rect = cb.getBoundingClientRect();
+      var m = Math.floor((e.clientY - rect.top) / SLOT) * 15 + 480;
+      return Math.max(480, Math.min(19 * 60 + 45, m));
+    };
+    cb.addEventListener('mousemove', function (e) {
+      if (e.target !== cb && e.target !== ghost) { ghost.style.display = 'none'; return; }
+      var m = slotAt(e); ghost.style.display = ''; ghost.style.top = ((m - 480) / 15 * SLOT) + 'px'; ghost.style.height = (SLOT * 4 - 2) + 'px';
+      ghost.textContent = '+ ' + fromMin(m);
+    });
+    cb.addEventListener('mouseleave', function () { ghost.style.display = 'none'; });
+    cb.addEventListener('click', function (e) {
+      if (e.target !== cb && e.target !== ghost) return;
+      sessionDialog(null, { date: ds, start: fromMin(slotAt(e)), roomId: r.id, therapistId: A.thFilter || '' });
+    });
+    sessions.filter(function (s) { return s.roomId === r.id; }).forEach(function (s) {
+      var t = TH(s.therapistId) || { name: '?', color: '#777' };
+      var top = (toMin(s.start) - 480) / 15 * SLOT, hgt = (toMin(s.end) - toMin(s.start)) / 15 * SLOT - 2;
+      put(cb, el('div', { class: 'sess' + (A.thFilter && A.thFilter !== s.therapistId ? ' dim' : ''), style: { top: top + 'px', height: hgt + 'px', background: t.color },
+        title: s.start + '–' + s.end + ' · ' + t.name + ' · ' + s.patient + (s.note ? '\n' + s.note : ''),
+        onclick: function (e) { e.stopPropagation(); sessionDialog(s); } },
+        s.doc ? el('span', { class: 'ok', title: 'סיכום נרשם', text: '✓' }) : null,
+        el('div', { class: 't' }, ltr(s.start + '–' + s.end), s.seriesId ? el('span', { class: 'rep', text: ' 🔁' }) : null),
+        el('div', { class: 'p', text: s.patient }),
+        el('div', { class: 'th', text: t.name })));
+    });
+    put(col, cb); put(grid, col);
+  });
+  if (isToday && nowMin >= 480 && nowMin <= 1200) put(grid, el('div', { class: 'nowline', style: 'top:' + (44 + (nowMin - 480) / 15 * SLOT) + 'px' }));
+  put(body, el('div', { class: 'daywrap' }, grid));
+  put(body, el('p', { class: 'muted small noprint', text: 'טיפ: לחיצה על משבצת ריקה בעמודת חדר פותחת שיבוץ חדש באותה שעה. לחיצה על טיפול – עריכה, העברה או ביטול. 🔁 = טיפול קבוע שבועי. ✓ = סיכום נרשם בקליקס.' }));
+}
+
+/* ───────── חלון שיבוץ / עריכת טיפול ───────── */
+var DURS = [15, 30, 45, 60, 75, 90, 105, 120, 150, 180, 240];
+function patientDatalist() {
+  var dl = el('datalist', { id: 'ptlist' });
+  A.patients.forEach(function (p) {
+    var lbl = [p.group, p.house ? 'בית ' + p.house : '', p.hint ? 'מטפל/ת: ' + p.hint : ''].filter(Boolean).join(' · ');
+    put(dl, el('option', { value: p.name, label: lbl }));
+  });
+  return dl;
+}
+function findPatient(name) {
+  var k = String(name || '').replace(/\s+/g, ' ').trim();
+  for (var i = 0; i < A.patients.length; i++) if (A.patients[i].name === k) return A.patients[i];
+  return null;
+}
+function matchTherapistHint(hint) {
+  if (!hint) return null;
+  var h = hint.trim(), list = activeTh();
+  for (var i = 0; i < list.length; i++) if (list[i].name === h || firstName(list[i].name) === h) return list[i];
+  return null;
+}
+function sessionDialog(s, preset) {
+  preset = preset || {};
+  if (!activeRooms().length || !activeTh().length) { alertBox('יש להגדיר קודם חדרים ומטפלים.'); return; }
+  var isNew = !s;
+  var v = s ? { date: s.date, start: s.start, dur: toMin(s.end) - toMin(s.start), roomId: s.roomId, therapistId: s.therapistId, patient: s.patient, note: s.note }
+            : { date: preset.date || A.date, start: preset.start || '09:00', dur: +A.settings.defaultDur || 60, roomId: preset.roomId || '', therapistId: preset.therapistId || '', patient: '', note: '' };
+  var dateIn = el('input', { type: 'date', class: 'inp w', value: v.date });
+  var dateTxt = el('div', { class: 'muted small' });
+  var startSel = el('select', { class: 'inp w' });
+  for (var m = 480; m < 1200; m += 15) put(startSel, el('option', { value: fromMin(m), text: fromMin(m) }));
+  if (!startSel.querySelector('option[value="' + v.start + '"]')) put(startSel, el('option', { value: v.start, text: v.start }));
+  startSel.value = v.start;
+  var durSel = el('select', { class: 'inp w' });
+  var durs = DURS.slice(); if (durs.indexOf(v.dur) < 0) durs.push(v.dur); durs.sort(function (a, b) { return a - b; });
+  durs.forEach(function (d) { put(durSel, el('option', { value: d, text: d + ' דקות' + (d === 60 ? ' (שעה)' : '') })); });
+  durSel.value = String(v.dur);
+  var endTxt = el('div', { class: 'small' });
+  var roomSel = el('select', { class: 'inp w' }, el('option', { value: '', text: '— בחירת חדר —' }),
+    activeRooms().map(function (r) { return el('option', { value: r.id, text: r.name }); }));
+  roomSel.value = v.roomId;
+  var thSel = el('select', { class: 'inp w' }, el('option', { value: '', text: '— בחירת מטפל —' }),
+    activeTh().map(function (t) { return el('option', { value: t.id, text: t.name }); }));
+  thSel.value = v.therapistId;
+  var ptIn = el('input', { class: 'inp w', list: 'ptlist', value: v.patient, autocomplete: 'off', placeholder: 'התחילו להקליד שם…' });
+  var ptInfo = el('div', { class: 'small muted' });
+  var addPt = el('input', { type: 'checkbox', checked: true });
+  var addPtRow = el('label', { class: 'small', style: 'display:none;gap:6px;align-items:center;margin-top:4px' }, addPt, 'להוסיף את השם לרשימת המטופלים');
+  var noteIn = el('textarea', { class: 'inp w', rows: 2, maxlength: 500, placeholder: 'הערה פנימית (לא נשלחת למטפל)' }, v.note || '');
+  noteIn.value = v.note || '';
+  var repChk = el('input', { type: 'checkbox' });
+  var repN = el('input', { type: 'number', class: 'inp', min: 2, max: 52, value: 12, style: 'width:80px' });
+  var scope = 'one';
+  var scopeBox = null;
+
+  function refresh() {
+    var ds = dateIn.value;
+    if (ds) {
+      var hol = holiday(ds);
+      dateTxt.textContent = dayName(ds) + ' · ' + hFull(ds) + (hol ? ' · ' + hol : '') + (!isWork(ds) ? ' — ⚠️ אין טיפולים בימי שישי ושבת' : '');
+      dateTxt.style.color = !isWork(ds) ? 'var(--bad)' : '';
+    }
+    var e = toMin(startSel.value) + +durSel.value;
+    endTxt.textContent = 'סיום: ' + fromMin(e) + (e > 1200 ? ' — ⚠️ אחרי 20:00' : '');
+    endTxt.style.color = e > 1200 ? 'var(--bad)' : '';
+    var p = findPatient(ptIn.value);
+    clear(ptInfo);
+    if (p) ptInfo.textContent = [p.group, p.house ? 'בית ' + p.house : '', p.hint ? 'מטפל/ת לפי הגיליון: ' + p.hint : ''].filter(Boolean).join(' · ');
+    addPtRow.style.display = ptIn.value.trim().length > 1 && !p ? 'flex' : 'none';
+  }
+  ptIn.addEventListener('input', function () {
+    var p = findPatient(ptIn.value);
+    if (p && !thSel.value) { var t = matchTherapistHint(p.hint); if (t) { thSel.value = t.id; toast('נבחר/ה ' + t.name + ' לפי גיליון המטופלים'); } }
+    refresh();
+  });
+  [dateIn, startSel, durSel].forEach(function (n) { n.addEventListener('change', refresh); });
+  refresh();
+
+  var body = el('div', {},
+    patientDatalist(),
+    el('div', { class: 'grid2' },
+      el('div', {}, el('label', { class: 'lb', text: 'תאריך' }), dateIn, dateTxt),
+      el('div', {}, el('label', { class: 'lb', text: 'חדר' }), roomSel)),
+    el('div', { class: 'grid2' },
+      el('div', {}, el('label', { class: 'lb', text: 'שעת התחלה' }), startSel),
+      el('div', {}, el('label', { class: 'lb', text: 'משך' }), durSel, endTxt)),
+    el('label', { class: 'lb', text: 'מטפל/ת' }), thSel,
+    el('label', { class: 'lb', text: 'מטופל/ת' }), ptIn, ptInfo, addPtRow,
+    A.patientsError ? el('div', { class: 'small', style: 'color:var(--warn)', text: '⚠️ ' + A.patientsError }) : null,
+    el('label', { class: 'lb', text: 'הערה' }), noteIn);
+
+  if (isNew) {
+    put(body, el('div', { class: 'notice info', style: 'margin-top:14px' },
+      el('label', { class: 'row', style: 'gap:8px' }, repChk, el('b', { text: '🔁 טיפול קבוע – חוזר כל שבוע' })),
+      el('div', { class: 'row small', style: 'margin-top:6px' }, 'למשך', repN, 'שבועות (כולל השבוע הזה)')));
+  } else {
+    var t = TH(s.therapistId);
+    put(body, el('div', { class: 'notice ' + (s.doc ? 'ok' : 'warn'), style: 'margin-top:14px' },
+      el('div', { class: 'row' }, el('span', { text: s.doc ? '✓ סיכום נרשם בקליקס' + (s.docAt ? ' (' + stamp(s.docAt) + (s.docBy === 'admin' ? ', סומן ע״י המנהל' : '') + ')' : '') : '☐ סיכום טרם סומן' }),
+        el('span', { class: 'spacer' }),
+        s.date <= localToday() ? el('button', { class: 'btn sm ' + (s.doc ? 'ghost' : 'ok'), onclick: function () {
+          run('adminSetDoc', { id: s.id, done: !s.doc }).then(function (r) { if (r) { closeFn(); toast(r.doc ? 'סומן ✓' : 'הסימון בוטל'); renderTab(true); loadDocsCount(); } });
+        } }, s.doc ? 'ביטול סימון' : 'סמן כנרשם') : null)));
+    if (s.seriesId) {
+      var r1 = el('input', { type: 'radio', name: 'scope', checked: true, onchange: function () { scope = 'one'; } });
+      var r2 = el('input', { type: 'radio', name: 'scope', onchange: function () { scope = 'future'; } });
+      scopeBox = el('div', { class: 'notice info' }, el('b', { text: '🔁 טיפול קבוע. השינוי יחול על:' }),
+        el('label', { class: 'row', style: 'gap:6px' }, r1, 'טיפול זה בלבד'),
+        el('label', { class: 'row', style: 'gap:6px' }, r2, 'טיפול זה וכל הטיפולים הבאים בסדרה'));
+      put(body, scopeBox);
+    }
+    if (t) put(body, el('p', { class: 'muted small', text: 'עודכן לאחרונה: ' + stamp(s.updatedAt) }));
+  }
+
+  var closeFn;
+  function payload(extra) {
+    var p = { date: dateIn.value, start: startSel.value, end: fromMin(toMin(startSel.value) + +durSel.value), roomId: roomSel.value, therapistId: thSel.value, patient: ptIn.value, note: noteIn.value };
+    if (s) { p.id = s.id; p.scope = scope; }
+    else if (repChk.checked) p.repeatWeeks = Math.max(2, Math.min(52, parseInt(repN.value, 10) || 2));
+    Object.keys(extra || {}).forEach(function (k) { p[k] = extra[k]; });
+    return p;
+  }
+  function afterSave(r) {
+    var p = payload();
+    var needAdd = addPt.checked && addPtRow.style.display !== 'none';
+    var done = function () {
+      closeFn();
+      var n = r.saved.length;
+      toast(isNew ? (n > 1 ? '🔁 נשמרו ' + n + ' טיפולים קבועים' + (r.skipped.length ? ' (דולגו ' + r.skipped.length + ')' : '') : 'הטיפול נשמר ✓') : (n > 1 ? 'עודכנו ' + n + ' טיפולים ✓' : 'השינוי נשמר ✓'));
+      if (A.tab === 'day' && p.date !== A.date && n === 1 && isNew) { A.date = p.date; }
+      renderTab(true);
+    };
+    if (needAdd) call('adminSavePatient', { name: p.patient }).then(function (d) { A.patients = d.patients; done(); }, done); else done();
+  }
+  function save() {
+    var p = payload();
+    if (!p.roomId) { alertBox('נא לבחור חדר'); return false; }
+    if (!p.therapistId) { alertBox('נא לבחור מטפל'); return false; }
+    if (p.patient.trim().length < 2) { alertBox('נא לבחור או להזין מטופל'); return false; }
+    if (toMin(p.end) > 1200) { alertBox('הטיפול מסתיים אחרי 20:00. נא לקצר או להקדים.'); return false; }
+    busy(true, 'שומר…');
+    call('adminSaveSession', p).then(function (r) { busy(false); afterSave(r); }, function (e) {
+      busy(false);
+      if (/התנגשויות בחלק/.test(e.message)) {
+        confirmBox('חלק מהתאריכים תפוסים', e.message + '\n\nלשבץ רק בתאריכים הפנויים?', 'כן, לשבץ בפנויים').then(function (ok) {
+          if (!ok) return;
+          run('adminSaveSession', payload({ skipConflicts: true }), 'שומר…').then(function (r) { if (r) afterSave(r); });
+        });
+      } else alertBox(e.message);
+    });
+    return false;
+  }
+  var acts = [{ label: isNew ? '💾 שיבוץ' : '💾 שמירת שינויים', cls: 'primary', fn: save }];
+  if (!isNew) {
+    acts.push({ label: '📄 שכפול', cls: 'ghost', fn: function () {
+      closeFn(); sessionDialog(null, { date: s.date, start: s.start, roomId: s.roomId, therapistId: s.therapistId }); return false;
+    } });
+    acts.push({ label: '🗑️ ביטול הטיפול', cls: 'danger', fn: function () {
+      var sc = scope;
+      var msg = sc === 'future' ? 'לבטל את הטיפול הזה ואת כל הטיפולים הבאים בסדרה?' : 'לבטל את הטיפול ב' + dayLong(s.date) + ' ב-' + s.start + ' (' + s.patient + ')?';
+      confirmBox('ביטול טיפול', msg + '\n\nאחרי הביטול כדאי לשלוח למטפל עדכון מלשונית "שליחה למטפלים".', 'כן, לבטל', 'danger').then(function (ok) {
+        if (!ok) return;
+        run('adminDeleteSession', { id: s.id, scope: sc }, 'מבטל…').then(function (r) {
+          if (!r) return; closeFn(); toast(r.deleted > 1 ? 'בוטלו ' + r.deleted + ' טיפולים' : 'הטיפול בוטל'); renderTab(true);
+        });
+      });
+      return false;
+    } });
+  }
+  closeFn = modal(isNew ? '➕ שיבוץ טיפול' : '✏️ עריכת טיפול', body, acts, { noFocus: true });
+  if (isNew) setTimeout(function () { ptIn.focus(); }, 30);
+}
+
+/* ───────── תצוגה שבועית ───────── */
+function tabWeek(body, silent) {
+  var ws = A.weekStart, we = addDays(ws, 4);
+  fetchRange(ws, we, silent).then(function (d) {
+    if (!d || A.tab !== 'week' || A.weekStart !== ws) return;
+    var wy = window.scrollY;
+    clear(body);
+    var today = localToday();
+    var thSel = el('select', { class: 'inp', onchange: function (e) { A.thFilter = e.target.value; tabWeek(body, true); } },
+      el('option', { value: '', text: 'כל המטפלים' }), activeTh().map(function (t) { return el('option', { value: t.id, text: t.name, selected: A.thFilter === t.id }); }));
+    var hy = hp(we).y;
+    put(body, el('div', { class: 'datenav noprint' },
+      el('button', { class: 'btn ghost sm', onclick: function () { A.weekStart = addDays(ws, -7); tabWeek(body); } }, '→ שבוע קודם'),
+      el('button', { class: 'btn ghost sm', onclick: function () { A.weekStart = weekStart(today); tabWeek(body); } }, 'השבוע'),
+      el('button', { class: 'btn ghost sm', onclick: function () { A.weekStart = addDays(ws, 7); tabWeek(body); } }, 'שבוע הבא ←'),
+      el('div', {}, el('div', { class: 'title' }, ltr(gShort(ws)), ' – ', ltr(gShort(we) + '.' + we.slice(0, 4))),
+        el('div', { class: 'htitle', text: hDate(ws) + ' – ' + hDate(we) + (hy ? ' ' + gem(hy % 1000) : '') })),
+      el('span', { class: 'spacer' }), thSel,
+      el('button', { class: 'btn ghost', onclick: function () { window.print(); } }, '🖨️')));
+    var list = d.sessions.filter(function (s) { return !A.thFilter || s.therapistId === A.thFilter; });
+    var grid = el('div', { class: 'weekgrid' });
+    for (var i = 0; i < 5; i++) (function (ds) {
+      var mine = list.filter(function (s) { return s.date === ds; });
+      var hol = holiday(ds);
+      put(grid, el('div', { class: 'wday' + (ds === today ? ' today' : '') },
+        el('h3', { title: 'מעבר ללוח היומי', onclick: function () { A.date = ds; A.tab = 'day'; ls('tab', 'day'); renderAdmin(); } }, dayName(ds) + ' ' + gShort(ds)),
+        el('div', { class: 'h' }, hDate(ds), hol ? el('span', { class: 'badge hol', style: 'margin-inline-start:6px', text: hol }) : null),
+        mine.length ? mine.map(function (s) {
+          var t = TH(s.therapistId) || { name: '?', color: '#777' }, r = ROOM(s.roomId) || { name: '?' };
+          return el('button', { class: 'chip', style: { '--c': t.color }, onclick: function () { sessionDialog(s); } },
+            el('b', {}, ltr(s.start + '–' + s.end)), s.doc ? ' ✓' : '', s.seriesId ? ' 🔁' : '',
+            el('div', { text: s.patient }),
+            el('div', { class: 's', text: (A.thFilter ? '' : t.name + ' · ') + r.name }));
+        }) : el('div', { class: 'muted small', text: 'אין טיפולים' }),
+        el('button', { class: 'btn ghost sm noprint', style: 'width:100%;margin-top:6px', onclick: function () { sessionDialog(null, { date: ds, therapistId: A.thFilter }); } }, '+ שיבוץ')));
+    })(addDays(ws, i));
+    put(body, grid);
+    // סיכום שבועי לפי מטפל
+    var tot = {};
+    d.sessions.forEach(function (s) { var o = tot[s.therapistId] || (tot[s.therapistId] = { n: 0, m: 0 }); o.n++; o.m += toMin(s.end) - toMin(s.start); });
+    var ids = Object.keys(tot);
+    if (ids.length) {
+      put(body, el('div', { class: 'card' }, el('h3', { text: 'סיכום שבועי לפי מטפל' }),
+        el('table', { class: 'tbl' }, el('thead', {}, el('tr', {}, el('th', { text: 'מטפל/ת' }), el('th', { text: 'טיפולים' }), el('th', { text: 'שעות' }))),
+          el('tbody', {}, ids.sort(function (a, b) { return tot[b].m - tot[a].m; }).map(function (id) {
+            var t = TH(id) || { name: '?', color: '#777' };
+            return el('tr', {}, el('td', {}, el('span', { class: 'dot', style: { background: t.color, 'margin-inline-end': '6px' } }), t.name),
+              el('td', { text: tot[id].n }), el('td', { text: (tot[id].m / 60).toFixed(tot[id].m % 60 ? 1 : 0) }));
+          })))));
+    }
+    if (silent) window.scrollTo(0, wy);
+  });
+}
+
+/* ───────── שליחה למטפלים ───────── */
+function sessionLine(s) { return '🕐 ' + s.start + ' עד ' + s.end + '  |  🚪 ' + s.room + '  |  👤 ' + s.patient; }
+function dayMessage(item, ds) {
+  var t = TH(item.therapistId) || item;
+  var lines = [];
+  if (item.changed) lines.push('🔄 *עדכון לשיבוץ*');
+  lines.push('שלום ' + firstName(item.name) + ',');
+  lines.push('השיבוץ שלך ל*' + dayName(ds) + ' ' + gShort(ds) + '* (' + hDate(ds) + '):');
+  lines.push('');
+  if (!item.sessions.length) lines.push('❌ אין לך טיפולים ביום זה (הטיפולים בוטלו).');
+  else item.sessions.forEach(function (s) { lines.push(sessionLine(s)); });
+  if (item.sessions.length) { lines.push(''); lines.push('סה״כ ' + item.sessions.length + ' טיפולים.'); }
+  lines.push('');
+  lines.push('📋 אחרי כתיבת הסיכום בקליקס – נא לסמן ✓ בקישור האישי שלך (מתעדכן אוטומטית בכל שינוי):');
+  lines.push(thLink(t));
+  return lines.join('\n');
+}
+function tabSend(body, silent) {
+  var ds = A.sendDate;
+  var p = silent ? call('adminSendList', { date: ds }).then(null, function () { return null; }) : run('adminSendList', { date: ds }, 'טוען…');
+  p.then(function (d) {
+    if (!d || A.tab !== 'send' || A.sendDate !== ds) return;
+    var wy = window.scrollY;
+    clear(body);
+    put(body, dateNav(ds, function (d2) { A.sendDate = d2; tabSend(body); }));
+    if (setupNotice(body)) return;
+    var list = d.list;
+    var waiting = list.filter(function (x) { return !x.sentAt || x.changed; });
+    put(body, el('div', { class: 'card' },
+      el('div', { class: 'row' }, el('h2', { style: 'margin:0', text: 'שליחת השיבוץ היומי בוואטסאפ' }), el('span', { class: 'spacer' }),
+        waiting.length ? el('button', { class: 'btn wa', onclick: function () { sendQueue(ds, waiting); } }, '📲 שליחה ברצף (' + waiting.length + ')') : null),
+      el('p', { class: 'muted small', text: 'כל לחיצה פותחת את וואטסאפ עם הודעה מוכנה למטפל – רק ללחוץ "שליחה". שם המטופל נשלח מקוצר (שם פרטי + אות משפחה). אם משנים שיבוץ אחרי השליחה – יופיע כאן "השתנה מאז השליחה" כדי לשלוח עדכון.' }),
+      !list.length ? el('div', { class: 'empty', text: 'אין טיפולים משובצים ביום זה.' }) :
+      list.map(function (x) {
+        var st = x.changed ? el('span', { class: 'badge warn', text: '⚠️ השתנה מאז השליחה' })
+          : x.sentAt ? el('span', { class: 'badge ok', text: '✓ נשלח ' + stamp(x.sentAt) }) : el('span', { class: 'badge bad', text: 'טרם נשלח' });
+        return el('div', { class: 'lrow' },
+          el('span', { class: 'dot', style: { background: x.color } }), el('span', { class: 'nm', text: x.name }),
+          el('span', { class: 'muted' }, x.sessions.length ? [x.sessions.length + ' טיפולים · ', ltr(x.sessions[0].start + '–' + x.sessions[x.sessions.length - 1].end)] : 'בוטלו כל הטיפולים'),
+          st, el('span', { class: 'spacer' }),
+          el('button', { class: 'btn ghost sm', onclick: function () { previewMsg(x, ds); } }, '👁️ תצוגה'),
+          el('button', { class: 'btn wa sm', onclick: function () { sendOne(x, ds); } }, x.changed ? '📲 שליחת עדכון' : '📲 שליחה'));
+      })));
+    if (silent) window.scrollTo(0, wy);
+  });
+}
+function sendOne(x, ds, after) {
+  openWa(x.phone, dayMessage(x, ds));
+  call('adminMarkSent', { therapistId: x.therapistId, date: ds }).then(function () { if (after) after(); else tabSend(document.getElementById('body'), true); }, function (e) { alertBox(e.message); });
+}
+function previewMsg(x, ds) {
+  var txt = dayMessage(x, ds);
+  modal('הודעה ל' + x.name, el('div', {}, el('div', { class: 'msgprev', text: txt }), el('p', { class: 'muted small', text: 'נייד: ' + x.phone })), [
+    { label: '📲 פתיחה בוואטסאפ', cls: 'wa', fn: function () { sendOne(x, ds); } },
+    { label: '📋 העתקה', cls: 'ghost', fn: function () { copyText(txt); return false; } }]);
+}
+function sendQueue(ds, items) {
+  var i = 0, closeFn;
+  var box = el('div');
+  function draw() {
+    clear(box);
+    if (i >= items.length) {
+      put(box, el('div', { class: 'center', style: 'padding:20px' }, el('div', { class: 'ic', text: '✅' }), el('h2', { text: 'נשלח לכל המטפלים' })));
+      return;
+    }
+    var x = items[i];
+    put(box, [el('p', { class: 'muted', text: 'הודעה ' + (i + 1) + ' מתוך ' + items.length }),
+      el('h3', { text: x.name + ' · ' + x.phone }), el('div', { class: 'msgprev', text: dayMessage(x, ds) }),
+      el('div', { class: 'acts', style: 'display:flex;gap:10px;margin-top:12px' },
+        el('button', { class: 'btn wa big', onclick: function () { sendOne(x, ds, function () {}); i++; draw(); } }, '📲 שליחה ל' + firstName(x.name)),
+        el('button', { class: 'btn ghost', onclick: function () { i++; draw(); } }, 'דילוג'))]);
+  }
+  draw();
+  closeFn = modal('שליחה ברצף – ' + dayName(ds) + ' ' + gShort(ds), box, [], { onClose: function () { tabSend(document.getElementById('body'), true); } });
+}
+
+/* ───────── מעקב סיכומים ───────── */
+function tabDocs(body, silent) {
+  var p = silent ? call('adminDocs').then(null, function () { return null; }) : run('adminDocs', {}, 'טוען…');
+  p.then(function (d) {
+    if (!d || A.tab !== 'docs') return;
+    docsCount = d.pending.length;
+    var c = document.getElementById('docscnt'); if (c) { c.textContent = docsCount; c.style.display = docsCount ? '' : 'none'; }
+    var wy = window.scrollY;
+    clear(body);
+    put(body, el('h1', { text: '📝 מעקב רישום סיכומים בקליקס' }));
+    put(body, el('p', { class: 'muted', text: 'טיפולים שהסתיימו (60 יום אחורה) ועדיין לא סומן שנרשם עבורם סיכום. המטפלים מסמנים מהקישור האישי; אפשר גם לסמן כאן.' }));
+    var st = d.weekStats || {};
+    var ids = Object.keys(st);
+    if (ids.length) {
+      put(body, el('div', { class: 'card' }, el('h3', { text: 'אחוז תיעוד ב-7 הימים האחרונים' }),
+        el('div', { class: 'stats' }, ids.map(function (id) {
+          var t = TH(id) || { name: '?', color: '#777' }, o = st[id], pc = Math.round(o.done / o.total * 100);
+          return el('div', { class: 'stat', style: { 'border-top': '4px solid ' + t.color } }, el('b', { text: pc + '%', style: { color: pc === 100 ? 'var(--ok)' : pc < 70 ? 'var(--bad)' : 'var(--warn)' } }),
+            t.name, el('div', { class: 'muted small', text: o.done + ' מתוך ' + o.total }));
+        }))));
+    }
+    if (!d.pending.length) { put(body, el('div', { class: 'card empty' }, el('div', { style: 'font-size:2.5rem', text: '🎉' }), 'כל הסיכומים סומנו. כל הכבוד לצוות!')); return; }
+    var by = {};
+    d.pending.forEach(function (s) { (by[s.therapistId] = by[s.therapistId] || []).push(s); });
+    Object.keys(by).sort(function (a, b) { return by[b].length - by[a].length; }).forEach(function (tid) {
+      var t = TH(tid) || { name: '?', color: '#777', phone: '' }, list = by[tid];
+      put(body, el('div', { class: 'card', style: { 'border-top': '5px solid ' + t.color } },
+        el('div', { class: 'row' }, el('h2', { style: 'margin:0', text: t.name }), el('span', { class: 'badge bad', text: list.length + ' חסרים' }),
+          el('span', { class: 'spacer' }),
+          t.phone && t.status === 'active' ? el('button', { class: 'btn wa sm', onclick: function () { openWa(t.phone, reminderMsg(t, list)); } }, '📲 תזכורת בוואטסאפ') : null),
+        el('table', { class: 'tbl' }, el('tbody', {}, list.map(function (s) {
+          var r = ROOM(s.roomId) || { name: '' };
+          var age = Math.round((D(localToday()) - D(s.date)) / 864e5);
+          return el('tr', {},
+            el('td', { text: dayName(s.date) + ' ' + gShort(s.date) }), el('td', {}, ltr(s.start + '–' + s.end)),
+            el('td', { text: s.patient }), el('td', { class: 'muted', text: r.name }),
+            el('td', {}, age >= 3 ? el('span', { class: 'badge bad', text: 'לפני ' + age + ' ימים' }) : age > 0 ? el('span', { class: 'badge warn', text: age === 1 ? 'אתמול' : 'לפני ' + age + ' ימים' }) : el('span', { class: 'badge info', text: 'היום' })),
+            el('td', { style: 'text-align:left' }, el('button', { class: 'btn ok sm', onclick: function () {
+              run('adminSetDoc', { id: s.id, done: true }, 'מסמן…').then(function (r2) { if (r2) { toast('סומן ✓'); tabDocs(body, true); } });
+            } }, '✓ סמן כנרשם')));
+        })))));
+    });
+    if (silent) window.scrollTo(0, wy);
+  });
+}
+function reminderMsg(t, list) {
+  var lines = ['שלום ' + firstName(t.name) + ',', 'תזכורת ידידותית 🙏 טרם סומן רישום סיכום בקליקס עבור הטיפולים הבאים:', ''];
+  list.slice(0, 20).forEach(function (s) { lines.push('• ' + dayName(s.date) + ' ' + gShort(s.date) + ' בשעה ' + s.start + ' – ' + shortName(s.patient)); });
+  if (list.length > 20) lines.push('…ועוד ' + (list.length - 20));
+  lines.push('', 'אחרי הרישום – נא לסמן ✓ בקישור האישי:', thLink(t), '', 'תודה!');
+  return lines.join('\n');
+}
+
+/* ───────── מטפלים ───────── */
+function inviteText(t) {
+  return 'שלום ' + firstName(t.name) + ',\nזה הקישור האישי שלך לצפייה בטיפולים המשובצים לך בקליניקה של בית מאזן בטבע (יום, שעה, חדר ומטופל).\n' +
+    'הקישור מתעדכן אוטומטית בכל שינוי, ובו מסמנים ✓ אחרי כתיבת סיכום בקליקס.\nכדאי לשמור אותו:\n' + thLink(t);
+}
+function therapistDialog(t) {
+  var nameIn = el('input', { class: 'inp w', value: t ? t.name : '', placeholder: 'שם פרטי ושם משפחה', autocomplete: 'off' });
+  var phoneIn = el('input', { class: 'inp w', type: 'tel', value: t ? t.phone : '', placeholder: '05X-XXXXXXX', dir: 'ltr', autocomplete: 'off' });
+  modal(t ? 'עריכת מטפל' : '➕ רישום מטפל חדש', el('div', {},
+    el('label', { class: 'lb', text: 'שם מלא' }), nameIn,
+    el('label', { class: 'lb', text: 'טלפון נייד (וואטסאפ)' }), phoneIn), [
+    { label: '💾 שמירה', cls: 'primary', fn: function () {
+      return run('adminSaveTherapist', { id: t ? t.id : '', name: nameIn.value, phone: phoneIn.value }, 'שומר…').then(function (r) {
+        if (!r) return false;
+        return call('adminBoot').then(function (d) {
+          applyBoot(d); renderTab(false);
+          if (!t) modal('המטפל נרשם ✓', el('div', {}, el('p', { text: 'לשלוח ל' + r.name + ' את הקישור האישי עכשיו?' })), [
+            { label: '📲 שליחת קישור בוואטסאפ', cls: 'wa', fn: function () { openWa(r.phone, inviteText(r)); } }, { label: 'אחר כך', cls: 'ghost' }]);
+          return true;
+        });
+      });
+    } }, { label: 'ביטול', cls: 'ghost' }]);
+}
+function tabTherapists(body) {
+  clear(body);
+  put(body, el('div', { class: 'row', style: 'margin-top:16px' }, el('h1', { style: 'margin:0', text: '👥 מטפלים' }), el('span', { class: 'spacer' }),
+    el('button', { class: 'btn primary', onclick: function () { therapistDialog(null); } }, '➕ מטפל חדש')));
+  put(body, el('p', { class: 'muted', text: 'לכל מטפל נוצר קישור אישי וסודי. בקישור הוא רואה רק את הטיפולים שלו ומסמן רישום סיכומים. רק אתם רואים את כל השיבוצים.' }));
+  var act = A.therapists.filter(function (t) { return t.status === 'active'; }), rem = A.therapists.filter(function (t) { return t.status !== 'active'; });
+  if (!act.length) put(body, el('div', { class: 'card empty', text: 'עדיין לא נרשמו מטפלים. לחצו "מטפל חדש".' }));
+  else put(body, el('div', { class: 'card' }, act.sort(function (a, b) { return a.name < b.name ? -1 : 1; }).map(function (t) {
+    return el('div', { class: 'lrow' },
+      el('span', { class: 'dot', style: { background: t.color } }), el('span', { class: 'nm', text: t.name }), ltr(t.phone),
+      el('span', { class: 'spacer' }),
+      el('button', { class: 'btn wa sm', onclick: function () { openWa(t.phone, inviteText(t)); } }, '📲 שליחת קישור'),
+      el('button', { class: 'btn ghost sm', onclick: function () { copyText(thLink(t)); } }, '🔗 העתקת קישור'),
+      el('button', { class: 'btn ghost sm', onclick: function () { window.open(thLink(t), '_blank', 'noopener'); } }, '👁️ מה המטפל רואה'),
+      el('button', { class: 'btn ghost sm', onclick: function () { therapistDialog(t); } }, '✏️ עריכה'),
+      el('button', { class: 'btn ghost sm', title: 'הקישור הישן יפסיק לעבוד', onclick: function () {
+        confirmBox('קישור חדש', 'ליצור ל' + t.name + ' קישור חדש? הקישור הקודם יפסיק לעבוד מיד (שימושי אם הקישור הגיע לאדם לא מורשה).', 'יצירת קישור חדש').then(function (ok) {
+          if (ok) run('adminTherapistAction', { id: t.id, action: 'newToken' }).then(function (r) { if (r) call('adminBoot').then(function (d) { applyBoot(d); tabTherapists(body); toast('נוצר קישור חדש – יש לשלוח אותו למטפל'); }); });
+        });
+      } }, '🔄 קישור חדש'),
+      el('button', { class: 'btn danger sm', onclick: function () {
+        confirmBox('הסרת מטפל', 'להסיר את ' + t.name + '? הקישור שלו יפסיק לעבוד. היסטוריית הטיפולים נשמרת.', 'הסרה', 'danger').then(function (ok) {
+          if (ok) run('adminTherapistAction', { id: t.id, action: 'remove' }).then(function (r) { if (r) call('adminBoot').then(function (d) { applyBoot(d); tabTherapists(body); }); });
+        });
+      } }, 'הסרה'));
+  })));
+  if (rem.length) put(body, el('details', { class: 'card' }, el('summary', { text: 'מטפלים שהוסרו (' + rem.length + ')' }), rem.map(function (t) {
+    return el('div', { class: 'lrow off' }, el('span', { class: 'nm', text: t.name }), ltr(t.phone), el('span', { class: 'spacer' }),
+      el('button', { class: 'btn ghost sm', onclick: function () { run('adminTherapistAction', { id: t.id, action: 'restore' }).then(function (r) { if (r) call('adminBoot').then(function (d) { applyBoot(d); tabTherapists(body); }); }); } }, 'החזרה'));
+  })));
+}
+
+/* ───────── חדרים ───────── */
+function tabRooms(body) {
+  clear(body);
+  put(body, el('h1', { text: '🚪 חדרי טיפול' }));
+  put(body, el('p', { class: 'muted', text: 'רשמו לכל חדר שם או כינוי (למשל: "חדר אלון", "חדר הגינה", "חדר 3"). הסדר כאן הוא סדר העמודות בלוח היומי.' }));
+  var nameIn = el('input', { class: 'inp', placeholder: 'שם / כינוי החדר', style: 'flex:1;min-width:200px', onkeydown: function (e) { if (e.key === 'Enter') add(); } });
+  function add() {
+    if (!nameIn.value.trim()) return;
+    run('adminSaveRoom', { name: nameIn.value }, 'שומר…').then(function (r) { if (r) { A.rooms = r; tabRooms(body); toast('החדר נוסף ✓'); setTimeout(function () { var n = body.querySelector('input'); if (n) n.focus(); }, 30); } });
+  }
+  put(body, el('div', { class: 'card' }, el('div', { class: 'row' }, nameIn, el('button', { class: 'btn primary', onclick: add }, '➕ הוספת חדר'))));
+  var act = A.rooms.filter(function (r) { return r.status === 'active'; }), rem = A.rooms.filter(function (r) { return r.status !== 'active'; });
+  var doAct = function (r, action) { run('adminRoomAction', { id: r.id, action: action }).then(function (x) { if (x) { A.rooms = x; tabRooms(body); } }); };
+  if (act.length) put(body, el('div', { class: 'card' }, act.map(function (r, i) {
+    return el('div', { class: 'lrow' },
+      el('span', { class: 'badge', text: String(i + 1) }), el('span', { class: 'nm', text: r.name }), el('span', { class: 'spacer' }),
+      el('button', { class: 'btn ghost sm', 'aria-label': 'למעלה', disabled: i === 0, onclick: function () { doAct(r, 'up'); } }, '▲'),
+      el('button', { class: 'btn ghost sm', 'aria-label': 'למטה', disabled: i === act.length - 1, onclick: function () { doAct(r, 'down'); } }, '▼'),
+      el('button', { class: 'btn ghost sm', onclick: function () {
+        var inp = el('input', { class: 'inp w', value: r.name });
+        modal('שינוי שם חדר', inp, [{ label: 'שמירה', cls: 'primary', fn: function () {
+          return run('adminSaveRoom', { id: r.id, name: inp.value }).then(function (x) { if (!x) return false; A.rooms = x; tabRooms(body); return true; });
+        } }, { label: 'ביטול', cls: 'ghost' }]);
+      } }, '✏️ שינוי שם'),
+      el('button', { class: 'btn danger sm', onclick: function () {
+        confirmBox('הסרת חדר', 'להסיר את "' + r.name + '"?', 'הסרה', 'danger').then(function (ok) { if (ok) doAct(r, 'remove'); });
+      } }, 'הסרה'));
+  })));
+  else put(body, el('div', { class: 'card empty', text: 'עדיין לא הוגדרו חדרים.' }));
+  if (rem.length) put(body, el('details', { class: 'card' }, el('summary', { text: 'חדרים שהוסרו (' + rem.length + ')' }), rem.map(function (r) {
+    return el('div', { class: 'lrow off' }, el('span', { class: 'nm', text: r.name }), el('span', { class: 'spacer' }), el('button', { class: 'btn ghost sm', onclick: function () { doAct(r, 'restore'); } }, 'החזרה'));
+  })));
+}
+
+/* ───────── מטופלים ───────── */
+function tabPatients(body) {
+  loadPatients(false).then(function (d) {
+    if (A.tab !== 'patients') return;
+    clear(body);
+    put(body, el('div', { class: 'row', style: 'margin-top:16px' }, el('h1', { style: 'margin:0', text: '🧑 מטופלים' }), el('span', { class: 'spacer' }),
+      el('button', { class: 'btn ghost', onclick: function () { tabPatients(body); } }, '🔄 רענון מהגיליון')));
+    put(body, el('p', { class: 'muted', text: 'הרשימה נקראת אוטומטית מגיליון "דיירים פעילים" (לשוניות: ' + (A.settings.patientTabs || '').split('|').join(', ') + '). רק השם, הבית והמטפל נקראים – ת״ז ופרטים אחרים אינם מועתקים. אפשר להוסיף כאן גם מטופלים שאינם בגיליון.' }));
+    if (A.patientsError) put(body, el('div', { class: 'notice bad', text: '⚠️ ' + A.patientsError + ' — ודאו שלחשבון שבו מותקנת המערכת יש הרשאת צפייה בגיליון.' }));
+    else put(body, el('div', { class: 'notice ok', text: '✓ מחובר לגיליון – ' + (A.sheetCount || 0) + ' מטופלים נקראו.' }));
+    var nameIn = el('input', { class: 'inp', placeholder: 'שם מלא של מטופל נוסף', style: 'flex:1;min-width:220px' });
+    put(body, el('div', { class: 'card' }, el('div', { class: 'row' }, nameIn, el('button', { class: 'btn primary', onclick: function () {
+      run('adminSavePatient', { name: nameIn.value }).then(function (r) { if (r) { A.patients = r.patients; tabPatients(body); toast('נוסף ✓'); } });
+    } }, '➕ הוספה ידנית'))));
+    var q = el('input', { class: 'inp w', placeholder: '🔍 חיפוש…', oninput: function () { draw(); } });
+    var listBox = el('div');
+    function draw() {
+      clear(listBox);
+      var k = q.value.trim();
+      var list = A.patients.filter(function (p) { return !k || p.name.indexOf(k) >= 0; });
+      put(listBox, el('table', { class: 'tbl' }, el('thead', {}, el('tr', {}, ['שם', 'מקור', 'בית', 'מטפל/ת לפי הגיליון', ''].map(function (h) { return el('th', { text: h }); }))),
+        el('tbody', {}, list.map(function (p) {
+          return el('tr', {}, el('td', {}, el('b', { text: p.name })), el('td', { class: 'muted', text: p.group }), el('td', { text: p.house }), el('td', { text: p.hint }),
+            el('td', { style: 'text-align:left' }, p.source === 'manual' ? el('button', { class: 'btn danger sm', onclick: function () {
+              confirmBox('הסרה', 'להסיר את ' + p.name + ' מהרשימה הידנית?', 'הסרה', 'danger').then(function (ok) {
+                if (ok) run('adminRemovePatient', { id: p.id }).then(function (r) { if (r) { A.patients = r.patients; tabPatients(body); } });
+              });
+            } }, 'הסרה') : null));
+        }))));
+      if (!list.length) put(listBox, el('div', { class: 'empty', text: 'אין תוצאות' }));
+    }
+    put(body, el('div', { class: 'card' }, q, listBox));
+    draw();
+  });
+}
+
+/* ───────── הגדרות ───────── */
+function tabSettings(body) {
+  clear(body);
+  var s = A.settings;
+  var src = el('input', { class: 'inp w', dir: 'ltr', value: s.patientSource ? 'https://docs.google.com/spreadsheets/d/' + s.patientSource + '/edit' : '' });
+  var tabs = el('input', { class: 'inp w', value: (s.patientTabs || '').split('|').join(', ') });
+  var dur = el('select', { class: 'inp' }, DURS.map(function (d) { return el('option', { value: d, text: d + ' דקות' }); }));
+  dur.value = s.defaultDur;
+  put(body, el('h1', { text: '⚙️ הגדרות' }));
+  put(body, el('div', { class: 'card' },
+    el('label', { class: 'lb', text: 'אורך טיפול ברירת מחדל' }), dur,
+    el('label', { class: 'lb', text: 'גיליון המטופלים (קישור Google Sheets)' }), src,
+    el('label', { class: 'lb', text: 'לשוניות לקריאה (מופרדות בפסיק)' }), tabs,
+    el('p', { class: 'muted small', text: 'ימי טיפול: א׳–ה׳ · שעות: 08:00–20:00.' }),
+    el('button', { class: 'btn primary', onclick: function () {
+      run('adminSaveSettings', { defaultDur: dur.value, patientSource: src.value, patientTabs: tabs.value }, 'שומר…').then(function (r) {
+        if (r) { A.settings = r; toast('ההגדרות נשמרו ✓'); loadPatients(true); }
+      });
+    } }, '💾 שמירה')));
+  put(body, el('div', { class: 'card' }, el('h3', { text: '🔐 קישור המנהל' }),
+    el('p', { class: 'muted small', text: 'הקישור הזה נותן גישה מלאה לכל השיבוצים. אין להעביר אותו לאף אחד. מומלץ לשמור אותו כסימנייה.' }),
+    el('div', { class: 'linkbox' }, location.href.split('#')[0], el('button', { class: 'btn ghost sm', onclick: function () { copyText(location.href.split('#')[0]); } }, 'העתקה')),
+    el('p', { class: 'muted small', text: 'גרסה ' + (BOOT.version || '') })));
+}
+
+/* ═════════════ הפעלה ═════════════ */
+function simple(icon, title, text) {
+  clear($app);
+  put($app, [topbar('קליניקה'), el('div', { class: 'wrap' }, el('div', { class: 'center' }, el('div', { class: 'ic', text: icon }), el('h1', { text: title }), text ? el('p', { class: 'muted', text: text }) : null))]);
+}
+function params() {
+  var q = {};
+  location.search.replace(/^\?/, '').split('&').forEach(function (kv) {
+    if (!kv) return;
+    var i = kv.indexOf('=');
+    q[decodeURIComponent(i < 0 ? kv : kv.slice(0, i))] = i < 0 ? '' : decodeURIComponent(kv.slice(i + 1).replace(/\+/g, ' '));
+  });
+  return q;
+}
+function start() {
+  if (BOOT.mode === 'admin') adminStart();
+  else if (BOOT.mode === 'therapist') therapistStart();
+  else if (BOOT.mode === 'denied') simple('🔒', 'הקישור אינו תקין', 'נא לפתוח את קישור המנהל המלא.');
+  else simple('🌿', 'בית מאזן בטבע', 'כדי לצפות בטיפולים יש לפתוח את הקישור האישי שנשלח אליך בוואטסאפ.');
+}
+function boot() {
+  var q = params();
+  if (window.DEV) { BOOT = window.DEV.boot(q); start(); return; }
+  $app.innerHTML = '<div style="padding:60px 20px;text-align:center;font-size:1.3rem;color:#2f6b45">🌿 טוען…</div>';
+  var tries = 0;
+  (function go() {
+    fetch(API_URL, { method: 'POST', credentials: 'omit', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'boot', params: q }) })
+    .then(function (r) { return r.json(); })
+    .then(function (r) {
+      if (!r || !r.ok) throw new Error((r && r.error) || 'boot');
+      BOOT = r.data; $app.innerHTML = ''; start();
+    })
+    .catch(function () {
+      if (++tries < 3) return setTimeout(go, 1500);
+      $app.innerHTML = '';
+      put($app, el('div', { class: 'center' }, el('p', { style: 'font-size:1.2rem', text: 'אין חיבור לשרת כרגע.' }),
+        el('button', { class: 'btn primary big', onclick: function () { location.reload(); } }, 'לנסות שוב')));
+    });
+  })();
+}
+window.__clinic = { dayMessage: dayMessage, holiday: holiday, hFull: hFull, shortName: shortName };
+boot();
+})();
+</script>
+</body>
+</html>
