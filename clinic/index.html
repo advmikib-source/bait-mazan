@@ -129,6 +129,16 @@ label.lb{display:block;font-weight:500;margin:12px 0 5px}
 .linkbox{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#f6f7f1;border:1px dashed #bfc5b5;border-radius:12px;padding:10px;word-break:break-all;font-size:.85rem;direction:ltr;text-align:left}
 .msgprev{white-space:pre-wrap;background:#e7fbe9;border-radius:12px;padding:12px;font-size:.95rem;border:1px solid #c5ebcb;max-height:50vh;overflow:auto}
 details>summary{cursor:pointer;font-weight:500;padding:6px 0}
+.pchips{display:flex;flex-wrap:wrap;gap:6px;min-height:38px;align-items:center;padding:6px;border:1px solid var(--line);border-radius:10px;background:#fafbf7}
+.pchip{display:inline-flex;align-items:center;gap:4px;background:var(--brand-soft);color:var(--brand);border-radius:999px;padding:3px 4px 3px 10px;font-weight:500;font-size:.92rem}
+.pchip.new{background:var(--warn-soft);color:var(--warn)}
+.pchip button{border:0;background:rgba(0,0,0,.08);border-radius:50%;width:22px;height:22px;font-size:.75rem;line-height:1;padding:0;color:inherit}
+.picklist{max-height:50vh;overflow:auto;border:1px solid var(--line);border-radius:10px;margin-top:8px}
+.pickhead{position:sticky;top:0;background:#f1f2ec;font-weight:700;padding:6px 10px;font-size:.88rem}
+.pickrow{display:flex;gap:10px;align-items:center;padding:8px 10px;border-bottom:1px solid #f0f1ea;cursor:pointer}
+.pickrow:hover{background:#f8f9f4}
+.pickrow input{width:20px;height:20px;flex:none}
+.tsess .mem{font-size:.92rem;color:var(--muted)}
 /* ── מסך מטפל ── */
 .daycard{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin:14px 0}
 .daycard.today{border:3px solid var(--brand)}
@@ -460,12 +470,13 @@ function thSetDoc(s, done) {
 function thSessionRow(s, opts) {
   var today = TV.data.today, nowMin = localToday() === today ? localNowMin() : -1;
   var isNow = s.date === today && toMin(s.start) <= nowMin && nowMin < toMin(s.end);
-  var canDoc = s.date <= today;
+  var canDoc = s.date <= today && !s.isGroup;
   return el('div', { class: 'tsess' + (isNow ? ' now' : '') },
     el('div', { class: 'tm' }, el('b', {}, ltr(s.start)), el('span', {}, 'עד ', ltr(s.end))),
     el('div', { class: 'inf' },
       opts && opts.showDate ? el('div', { class: 'muted small', text: dayName(s.date) + ' ' + gShort(s.date) }) : null,
-      el('div', { class: 'pt', text: s.patient }),
+      el('div', { class: 'pt', text: s.isGroup ? '👥 ' + s.patient : s.patient }),
+      s.isGroup && s.members && s.members.length ? el('div', { class: 'mem', text: s.members.length + ' משתתפים: ' + s.members.join(', ') }) : null,
       el('div', {}, el('span', { class: 'roomtag', text: '🚪 ' + s.room }), isNow ? el('span', { class: 'badge ok', style: 'margin-inline-start:8px', text: 'עכשיו' }) : null)),
     canDoc ? el('div', { style: 'width:100%' },
       s.doc ? el('div', { class: 'row' },
@@ -500,12 +511,13 @@ function renderTherapist() {
     var rel = relDay(ds, d.today), hol = holiday(ds), list = byDate[ds];
     var total = list.reduce(function (a, s) { return a + toMin(s.end) - toMin(s.start); }, 0);
     var done = list.filter(function (s) { return s.doc; }).length;
+    var need = list.filter(function (s) { return !s.isGroup; }).length;
     put(w, el('div', { class: 'daycard' + (ds === d.today ? ' today' : '') },
       el('div', { class: 'dh' },
         rel ? el('span', { class: 'badge ' + (ds === d.today ? 'ok' : 'info'), text: rel }) : null,
         el('b', { text: dayLong(ds) }), el('span', { class: 'muted', text: hFull(ds) }),
         hol ? el('span', { class: 'badge hol', text: hol }) : null),
-      el('div', { class: 'muted small', text: list.length + ' טיפולים · ' + durTxt(total) + (ds <= d.today ? ' · סיכומים: ' + done + '/' + list.length : '') }),
+      el('div', { class: 'muted small', text: list.length + ' טיפולים · ' + durTxt(total) + (ds <= d.today && need ? ' · סיכומים: ' + done + '/' + need : '') }),
       list.map(function (s) { return thSessionRow(s); })));
   });
   if (d.recentDone.length) {
@@ -649,11 +661,12 @@ function drawDay(body, ds, sessions) {
   var mins = sessions.reduce(function (a, s) { return a + toMin(s.end) - toMin(s.start); }, 0);
   var cap = rooms.length * 12 * 60;
   var docDone = sessions.filter(function (s) { return s.doc; }).length;
+  var docNeed = sessions.filter(function (s) { return !s.isGroup; }).length;
   put(body, el('div', { class: 'stats' },
     el('div', { class: 'stat' }, el('b', { text: sessions.length }), 'טיפולים'),
     el('div', { class: 'stat' }, el('b', { text: Object.keys(thSet).length }), 'מטפלים עובדים'),
     el('div', { class: 'stat' }, el('b', { text: (cap ? Math.round(mins / cap * 100) : 0) + '%' }), 'תפוסת חדרים'),
-    ds <= today ? el('div', { class: 'stat' }, el('b', { text: docDone + '/' + sessions.length }), 'סיכומים סומנו') : null));
+    ds <= today && docNeed ? el('div', { class: 'stat' }, el('b', { text: docDone + '/' + docNeed }), 'סיכומים סומנו') : null));
 
   if (isToday) {
     var strip = el('div', { class: 'nowstrip' });
@@ -667,7 +680,7 @@ function drawDay(body, ds, sessions) {
       var t = cur && TH(cur.therapistId);
       put(strip, el('div', { class: 'nowcard' + (cur ? ' busy' : ''), style: cur && t ? { 'border-inline-start-color': t.color } : null },
         el('div', { class: 'rn', text: '🚪 ' + r.name }),
-        cur ? [el('div', { class: 'who' }, el('b', { text: t ? t.name : '?' }), ' עם ', cur.patient), el('div', { class: 'meta' }, 'עד ', ltr(cur.end))]
+        cur ? [el('div', { class: 'who' }, el('b', { text: t ? t.name : '?' }), ' עם ', sessLabel(cur)), el('div', { class: 'meta' }, 'עד ', ltr(cur.end))]
             : el('div', { class: 'who muted', text: 'פנוי עכשיו' }),
         next ? el('div', { class: 'meta' }, 'הבא: ', ltr(next.start), ' · ' + ((TH(next.therapistId) || {}).name || '')) : null));
     });
@@ -705,11 +718,11 @@ function drawDay(body, ds, sessions) {
       var t = TH(s.therapistId) || { name: '?', color: '#777' };
       var top = (toMin(s.start) - 480) / 15 * SLOT, hgt = (toMin(s.end) - toMin(s.start)) / 15 * SLOT - 2;
       put(cb, el('div', { class: 'sess' + (A.thFilter && A.thFilter !== s.therapistId ? ' dim' : ''), style: { top: top + 'px', height: hgt + 'px', background: t.color },
-        title: s.start + '–' + s.end + ' · ' + t.name + ' · ' + s.patient + (s.note ? '\n' + s.note : ''),
+        title: s.start + '–' + s.end + ' · ' + t.name + ' · ' + (s.isGroup ? (s.groupName ? s.groupName + ': ' : '') + (s.patients || []).join(', ') : s.patient) + (s.note ? '\n' + s.note : ''),
         onclick: function (e) { e.stopPropagation(); sessionDialog(s); } },
         s.doc ? el('span', { class: 'ok', title: 'סיכום נרשם', text: '✓' }) : null,
         el('div', { class: 't' }, ltr(s.start + '–' + s.end), s.seriesId ? el('span', { class: 'rep', text: ' 🔁' }) : null),
-        el('div', { class: 'p', text: s.patient }),
+        el('div', { class: 'p', text: sessLabel(s) }),
         el('div', { class: 'th', text: t.name })));
     });
     put(col, cb); put(grid, col);
@@ -719,6 +732,12 @@ function drawDay(body, ds, sessions) {
   put(body, el('p', { class: 'muted small noprint', text: 'טיפ: לחיצה על משבצת ריקה בעמודת חדר פותחת שיבוץ חדש באותה שעה. לחיצה על טיפול – עריכה, העברה או ביטול. 🔁 = טיפול קבוע שבועי. ✓ = סיכום נרשם בקליקס.' }));
 }
 
+/** תיאור טיפול ללוח: שם המטופל, או שם הקבוצה ומספר המשתתפים */
+function sessLabel(s) {
+  if (!s.isGroup) return s.patient;
+  var n = (s.patients || []).length;
+  return '👥 ' + (s.groupName || 'טיפול קבוצתי') + ' (' + n + ')';
+}
 /* ───────── חלון שיבוץ / עריכת טיפול ───────── */
 var DURS = [15, 30, 45, 60, 75, 90, 105, 120, 150, 180, 240];
 function patientDatalist() {
@@ -744,8 +763,8 @@ function sessionDialog(s, preset) {
   preset = preset || {};
   if (!activeRooms().length || !activeTh().length) { alertBox('יש להגדיר קודם חדרים ומטפלים.'); return; }
   var isNew = !s;
-  var v = s ? { date: s.date, start: s.start, dur: toMin(s.end) - toMin(s.start), roomId: s.roomId, therapistId: s.therapistId, patient: s.patient, note: s.note }
-            : { date: preset.date || A.date, start: preset.start || '09:00', dur: +A.settings.defaultDur || 60, roomId: preset.roomId || '', therapistId: preset.therapistId || '', patient: '', note: '' };
+  var v = s ? { date: s.date, start: s.start, dur: toMin(s.end) - toMin(s.start), roomId: s.roomId, therapistId: s.therapistId, patients: (s.patients || [s.patient]).slice(), groupName: s.groupName || '', note: s.note }
+            : { date: preset.date || A.date, start: preset.start || '09:00', dur: +A.settings.defaultDur || 60, roomId: preset.roomId || '', therapistId: preset.therapistId || '', patients: (preset.patients || []).slice(), groupName: preset.groupName || '', note: '' };
   var dateIn = el('input', { type: 'date', class: 'inp w', value: v.date });
   var dateTxt = el('div', { class: 'muted small' });
   var startSel = el('select', { class: 'inp w' });
@@ -763,10 +782,67 @@ function sessionDialog(s, preset) {
   var thSel = el('select', { class: 'inp w' }, el('option', { value: '', text: '— בחירת מטפל —' }),
     activeTh().map(function (t) { return el('option', { value: t.id, text: t.name }); }));
   thSel.value = v.therapistId;
-  var ptIn = el('input', { class: 'inp w', list: 'ptlist', value: v.patient, autocomplete: 'off', placeholder: 'התחילו להקליד שם…' });
+  var parts = v.patients.filter(Boolean);
+  var ptIn = el('input', { class: 'inp', style: 'flex:1;min-width:180px', list: 'ptlist', autocomplete: 'off', placeholder: 'התחילו להקליד שם…' });
+  var chipsBox = el('div', { class: 'pchips' });
   var ptInfo = el('div', { class: 'small muted' });
   var addPt = el('input', { type: 'checkbox', checked: true });
-  var addPtRow = el('label', { class: 'small', style: 'display:none;gap:6px;align-items:center;margin-top:4px' }, addPt, 'להוסיף את השם לרשימת המטופלים');
+  var addPtRow = el('label', { class: 'small', style: 'display:none;gap:6px;align-items:center;margin-top:4px' }, addPt, 'להוסיף שמות שאינם ברשימה לרשימת המטופלים');
+  var groupIn = el('input', { class: 'inp w', maxlength: 60, value: v.groupName, placeholder: 'לא חובה – למשל "קבוצת הליכה"' });
+  var groupBox = el('div', { class: 'notice info', style: 'display:none;margin-top:10px' },
+    el('b', { text: '👥 טיפול קבוצתי' }), el('label', { class: 'lb', style: 'margin-top:6px', text: 'שם הקבוצה (לא חובה)' }), groupIn,
+    el('div', { class: 'small', style: 'margin-top:6px', text: 'בטיפול קבוצתי המטפל לא נדרש לסמן רישום סיכום בקליקס.' }));
+  function addPart(name) {
+    name = String(name || '').replace(/\s+/g, ' ').trim();
+    if (name.length < 2) return false;
+    if (parts.some(function (x) { return x === name; })) { toast(name + ' כבר ברשימה'); return false; }
+    parts.push(name);
+    if (parts.length === 1 && !thSel.value) { var p0 = findPatient(name), t0 = p0 && matchTherapistHint(p0.hint); if (t0) { thSel.value = t0.id; toast('נבחר/ה ' + t0.name + ' לפי גיליון המטופלים'); } }
+    drawParts(); return true;
+  }
+  function drawParts() {
+    clear(chipsBox);
+    parts.forEach(function (n, i) {
+      var p = findPatient(n);
+      put(chipsBox, el('span', { class: 'pchip' + (p ? '' : ' new'), title: p ? [p.group, p.house ? 'בית ' + p.house : '', p.hint ? 'מטפל/ת: ' + p.hint : ''].filter(Boolean).join(' · ') : 'לא ברשימת המטופלים' },
+        n, el('button', { type: 'button', 'aria-label': 'הסרת ' + n, onclick: function () { parts.splice(i, 1); drawParts(); } }, '✕')));
+    });
+    if (!parts.length) put(chipsBox, el('span', { class: 'muted small', text: 'טרם נבחרו משתתפים' }));
+    refresh();
+  }
+  function pickMany() {
+    var sel = {}; parts.forEach(function (n) { sel[n] = 1; });
+    var q = el('input', { class: 'inp w', placeholder: '🔍 חיפוש שם…' });
+    var box = el('div', { class: 'picklist' });
+    var cnt = el('b');
+    function draw() {
+      clear(box);
+      var k = q.value.trim(), groups = {};
+      A.patients.forEach(function (p) { if (!k || p.name.indexOf(k) >= 0) (groups[p.group || 'אחר'] = groups[p.group || 'אחר'] || []).push(p); });
+      Object.keys(groups).forEach(function (g) {
+        put(box, el('div', { class: 'pickhead', text: g + ' (' + groups[g].length + ')' }));
+        groups[g].forEach(function (p) {
+          var cb = el('input', { type: 'checkbox', checked: !!sel[p.name], onchange: function (e) { if (e.target.checked) sel[p.name] = 1; else delete sel[p.name]; cnt.textContent = Object.keys(sel).length; } });
+          put(box, el('label', { class: 'pickrow' }, cb, el('span', { text: p.name }), el('span', { class: 'muted small', text: [p.house ? 'בית ' + p.house : '', p.hint].filter(Boolean).join(' · ') })));
+        });
+      });
+      if (!box.firstChild) put(box, el('div', { class: 'empty', text: 'אין תוצאות' }));
+    }
+    q.addEventListener('input', draw);
+    cnt.textContent = Object.keys(sel).length;
+    draw();
+    modal('👥 בחירת משתתפים מרשימת הדיירים', el('div', {}, q, box, el('p', { class: 'small' }, 'נבחרו: ', cnt)), [
+      { label: '✓ אישור', cls: 'primary', fn: function () {
+        var keep = parts.filter(function (n) { return sel[n]; });
+        Object.keys(sel).forEach(function (n) { if (keep.indexOf(n) < 0) keep.push(n); });
+        var wasEmpty = !parts.length;
+        parts = keep;
+        if (wasEmpty && parts.length && !thSel.value) { var p0 = findPatient(parts[0]), t0 = p0 && matchTherapistHint(p0.hint); if (t0) thSel.value = t0.id; }
+        drawParts();
+      } },
+      { label: 'ביטול', cls: 'ghost' }]);
+  }
+  ptIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); if (addPart(ptIn.value)) ptIn.value = ''; } });
   var noteIn = el('textarea', { class: 'inp w', rows: 2, maxlength: 500, placeholder: 'הערה פנימית (לא נשלחת למטפל)' }, v.note || '');
   noteIn.value = v.note || '';
   var repChk = el('input', { type: 'checkbox' });
@@ -784,18 +860,19 @@ function sessionDialog(s, preset) {
     var e = toMin(startSel.value) + +durSel.value;
     endTxt.textContent = 'סיום: ' + fromMin(e) + (e > 1200 ? ' — ⚠️ אחרי 20:00' : '');
     endTxt.style.color = e > 1200 ? 'var(--bad)' : '';
-    var p = findPatient(ptIn.value);
     clear(ptInfo);
+    var p = parts.length === 1 ? findPatient(parts[0]) : null;
     if (p) ptInfo.textContent = [p.group, p.house ? 'בית ' + p.house : '', p.hint ? 'מטפל/ת לפי הגיליון: ' + p.hint : ''].filter(Boolean).join(' · ');
-    addPtRow.style.display = ptIn.value.trim().length > 1 && !p ? 'flex' : 'none';
+    else if (parts.length > 1) ptInfo.textContent = parts.length + ' משתתפים';
+    addPtRow.style.display = parts.some(function (n) { return !findPatient(n); }) ? 'flex' : 'none';
+    groupBox.style.display = parts.length > 1 || groupIn.value.trim() ? '' : 'none';
   }
   ptIn.addEventListener('input', function () {
-    var p = findPatient(ptIn.value);
-    if (p && !thSel.value) { var t = matchTherapistHint(p.hint); if (t) { thSel.value = t.id; toast('נבחר/ה ' + t.name + ' לפי גיליון המטופלים'); } }
-    refresh();
+    // בחירה מהרשימה הנפתחת מוסיפה את המשתתף מיד
+    if (findPatient(ptIn.value) && addPart(ptIn.value)) ptIn.value = '';
   });
   [dateIn, startSel, durSel].forEach(function (n) { n.addEventListener('change', refresh); });
-  refresh();
+  drawParts();
 
   var body = el('div', {},
     patientDatalist(),
@@ -806,7 +883,11 @@ function sessionDialog(s, preset) {
       el('div', {}, el('label', { class: 'lb', text: 'שעת התחלה' }), startSel),
       el('div', {}, el('label', { class: 'lb', text: 'משך' }), durSel, endTxt)),
     el('label', { class: 'lb', text: 'מטפל/ת' }), thSel,
-    el('label', { class: 'lb', text: 'מטופל/ת' }), ptIn, ptInfo, addPtRow,
+    el('label', { class: 'lb', text: 'מטופל/ת – אחד או כמה משתתפים' }), chipsBox,
+    el('div', { class: 'row', style: 'margin-top:6px' }, ptIn,
+      el('button', { type: 'button', class: 'btn ghost sm', onclick: function () { if (addPart(ptIn.value)) ptIn.value = ''; ptIn.focus(); } }, '➕ הוספה'),
+      el('button', { type: 'button', class: 'btn ghost sm', onclick: pickMany }, '👥 בחירת כמה מהרשימה')),
+    ptInfo, addPtRow, groupBox,
     A.patientsError ? el('div', { class: 'small', style: 'color:var(--warn)', text: '⚠️ ' + A.patientsError }) : null,
     el('label', { class: 'lb', text: 'הערה' }), noteIn);
 
@@ -816,7 +897,7 @@ function sessionDialog(s, preset) {
       el('div', { class: 'row small', style: 'margin-top:6px' }, 'למשך', repN, 'שבועות (כולל השבוע הזה)')));
   } else {
     var t = TH(s.therapistId);
-    put(body, el('div', { class: 'notice ' + (s.doc ? 'ok' : 'warn'), style: 'margin-top:14px' },
+    if (!s.isGroup) put(body, el('div', { class: 'notice ' + (s.doc ? 'ok' : 'warn'), style: 'margin-top:14px' },
       el('div', { class: 'row' }, el('span', { text: s.doc ? '✓ סיכום נרשם בקליקס' + (s.docAt ? ' (' + stamp(s.docAt) + (s.docBy === 'admin' ? ', סומן ע״י המנהל' : '') + ')' : '') : '☐ סיכום טרם סומן' }),
         el('span', { class: 'spacer' }),
         s.date <= localToday() ? el('button', { class: 'btn sm ' + (s.doc ? 'ghost' : 'ok'), onclick: function () {
@@ -835,7 +916,11 @@ function sessionDialog(s, preset) {
 
   var closeFn;
   function payload(extra) {
-    var p = { date: dateIn.value, start: startSel.value, end: fromMin(toMin(startSel.value) + +durSel.value), roomId: roomSel.value, therapistId: thSel.value, patient: ptIn.value, note: noteIn.value };
+    var list = parts.slice();
+    var extraName = ptIn.value.replace(/\s+/g, ' ').trim();
+    if (extraName.length > 1 && list.indexOf(extraName) < 0) list.push(extraName);
+    var p = { date: dateIn.value, start: startSel.value, end: fromMin(toMin(startSel.value) + +durSel.value), roomId: roomSel.value, therapistId: thSel.value,
+      patients: list, groupName: list.length > 1 || groupIn.value.trim() ? groupIn.value : '', note: noteIn.value };
     if (s) { p.id = s.id; p.scope = scope; }
     else if (repChk.checked) p.repeatWeeks = Math.max(2, Math.min(52, parseInt(repN.value, 10) || 2));
     Object.keys(extra || {}).forEach(function (k) { p[k] = extra[k]; });
@@ -843,7 +928,7 @@ function sessionDialog(s, preset) {
   }
   function afterSave(r) {
     var p = payload();
-    var needAdd = addPt.checked && addPtRow.style.display !== 'none';
+    var unknown = addPt.checked ? p.patients.filter(function (n) { return !findPatient(n); }) : [];
     var done = function () {
       closeFn();
       var n = r.saved.length;
@@ -851,13 +936,15 @@ function sessionDialog(s, preset) {
       if (A.tab === 'day' && p.date !== A.date && n === 1 && isNew) { A.date = p.date; }
       renderTab(true);
     };
-    if (needAdd) call('adminSavePatient', { name: p.patient }).then(function (d) { A.patients = d.patients; done(); }, done); else done();
+    var chain = Promise.resolve();
+    unknown.forEach(function (n) { chain = chain.then(function () { return call('adminSavePatient', { name: n }).then(function (d) { A.patients = d.patients; }, function () {}); }); });
+    chain.then(done);
   }
   function save() {
     var p = payload();
     if (!p.roomId) { alertBox('נא לבחור חדר'); return false; }
     if (!p.therapistId) { alertBox('נא לבחור מטפל'); return false; }
-    if (p.patient.trim().length < 2) { alertBox('נא לבחור או להזין מטופל'); return false; }
+    if (!p.patients.length) { alertBox('נא לבחור מטופל אחד לפחות'); return false; }
     if (toMin(p.end) > 1200) { alertBox('הטיפול מסתיים אחרי 20:00. נא לקצר או להקדים.'); return false; }
     busy(true, 'שומר…');
     call('adminSaveSession', p).then(function (r) { busy(false); afterSave(r); }, function (e) {
@@ -874,7 +961,7 @@ function sessionDialog(s, preset) {
   var acts = [{ label: isNew ? '💾 שיבוץ' : '💾 שמירת שינויים', cls: 'primary', fn: save }];
   if (!isNew) {
     acts.push({ label: '📄 שכפול', cls: 'ghost', fn: function () {
-      closeFn(); sessionDialog(null, { date: s.date, start: s.start, roomId: s.roomId, therapistId: s.therapistId }); return false;
+      closeFn(); sessionDialog(null, { date: s.date, start: s.start, roomId: s.roomId, therapistId: s.therapistId, patients: s.isGroup ? s.patients : [], groupName: s.groupName }); return false;
     } });
     acts.push({ label: '🗑️ ביטול הטיפול', cls: 'danger', fn: function () {
       var sc = scope;
@@ -923,7 +1010,7 @@ function tabWeek(body, silent) {
           var t = TH(s.therapistId) || { name: '?', color: '#777' }, r = ROOM(s.roomId) || { name: '?' };
           return el('button', { class: 'chip', style: { '--c': t.color }, onclick: function () { sessionDialog(s); } },
             el('b', {}, ltr(s.start + '–' + s.end)), s.doc ? ' ✓' : '', s.seriesId ? ' 🔁' : '',
-            el('div', { text: s.patient }),
+            el('div', { text: sessLabel(s) }),
             el('div', { class: 's', text: (A.thFilter ? '' : t.name + ' · ') + r.name }));
         }) : el('div', { class: 'muted small', text: 'אין טיפולים' }),
         el('button', { class: 'btn ghost sm noprint', style: 'width:100%;margin-top:6px', onclick: function () { sessionDialog(null, { date: ds, therapistId: A.thFilter }); } }, '+ שיבוץ')));
@@ -947,7 +1034,7 @@ function tabWeek(body, silent) {
 }
 
 /* ───────── שליחה למטפלים ───────── */
-function sessionLine(s) { return '🕐 ' + s.start + ' עד ' + s.end + '  |  🚪 ' + s.room + '  |  👤 ' + s.patient; }
+function sessionLine(s) { return '🕐 ' + s.start + ' עד ' + s.end + '  |  🚪 ' + s.room + '  |  ' + (s.isGroup ? '👥 ' : '👤 ') + s.patient; }
 function dayMessage(item, ds) {
   var t = TH(item.therapistId) || item;
   var lines = [];
