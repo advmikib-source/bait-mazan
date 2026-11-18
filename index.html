@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<base target="_top"><meta name="viewport" content="width=device-width, initial-scale=1"><title>משמרות – בית מאזן בטבע</title>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f3ec; --card:#ffffff; --ink:#1d2a21; --muted:#56635a; --line:#d9dccf;
+  --brand:#2f6b45; --brand-ink:#ffffff; --brand-soft:#e3f1e7;
+  --ok:#1f7a3f; --ok-soft:#dff3e5; --bad:#b3261e; --bad-soft:#fbe4e2; --warn:#8a5a00; --warn-soft:#fff2cf;
+  --M:#a86b00; --M-soft:#fff3d6; --E:#b5482f; --E-soft:#fde6df; --N:#3a4aa3; --N-soft:#e4e8fb;
+  --W:#6d757d; --W-bg:#ffffff; --G:#2c8a4f; --G-bg:#e2f4e8;
+  --radius:16px; --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 14px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box}
+html{font-size:18px;-webkit-text-size-adjust:100%}
+html.admin{font-size:15px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Rubik,"Segoe UI",Arial,sans-serif;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #f0b400;outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 140px}
+.admin .wrap{max-width:1200px;padding-bottom:60px}
+.topbar{background:var(--brand);color:var(--brand-ink);padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20}
+.topbar .logo{font-weight:700;font-size:1.05rem;flex:1;display:flex;gap:8px;align-items:center}
+.topbar .logo small{font-weight:400;opacity:.85}
+.fontbtn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:10px;min-width:48px;height:44px;font-weight:700}
+h1{font-size:1.6rem;margin:22px 0 6px}
+h2{font-size:1.3rem;margin:0 0 4px}
+h3{font-size:1.1rem;margin:0 0 8px}
+.muted{color:var(--muted)}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin:16px 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:2px solid transparent;border-radius:12px;padding:10px 18px;min-height:48px;font-weight:500;background:#eceee6;color:var(--ink);text-decoration:none}
+.btn:hover{filter:brightness(.97)}
+.btn.primary{background:var(--brand);color:#fff}
+.btn.ok{background:var(--ok);color:#fff}
+.btn.danger{background:var(--bad-soft);color:var(--bad);border-color:#f0b7b2}
+.btn.ghost{background:transparent;border-color:var(--line)}
+.btn.wa{background:#1fa855;color:#fff}
+.btn.small{min-height:36px;padding:5px 12px;font-size:.92rem;border-radius:10px}
+.btn.big{min-height:64px;font-size:1.25rem;padding:12px 28px;border-radius:16px;font-weight:700}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.spacer{flex:1}
+.badge{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.85rem;font-weight:500;background:#eceee6;white-space:nowrap}
+.badge.open{background:var(--warn-soft);color:var(--warn)}
+.badge.closed{background:#e8e6f6;color:#4a3f9a}
+.badge.published{background:var(--ok-soft);color:var(--ok)}
+.badge.hol{background:#f3e8ff;color:#6b2fa3}
+.badge.W{background:#fff;color:#333;border:2px solid #9aa1a8}
+.badge.G{background:var(--G);color:#fff;border:2px solid var(--G)}
+.notice{border-radius:12px;padding:12px 14px;margin:12px 0}
+.notice.ok{background:var(--ok-soft);color:#14512a}
+.notice.warn{background:var(--warn-soft);color:#5e3d00}
+.notice.bad{background:var(--bad-soft);color:#7d1a14}
+.notice.info{background:#e7eef8;color:#1d3d66}
+/* ── מסך מדריך ── */
+.steps{margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;margin:10px 0;font-size:1.05rem}
+.steps li::before{content:counter(s);flex:none;width:34px;height:34px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.day{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin:12px 0;border-inline-start:6px solid transparent}
+.day.sat{border-inline-start-color:#8f7bd1;background:#fbfaff}
+.day.past{opacity:.45}
+.dayhead{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;margin-bottom:10px}
+.dayhead .dname{font-weight:700;font-size:1.15rem}
+.dayhead .gdate{font-size:1.1rem}
+.dayhead .hdate{color:var(--muted)}
+.shiftbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sbtn{border:3px solid var(--line);background:#fff;border-radius:14px;min-height:92px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:transform .05s}
+.sbtn:active{transform:scale(.97)}
+.sbtn .ic{font-size:1.5rem;line-height:1}
+.sbtn .nm{font-weight:700;font-size:1.1rem}
+.sbtn .hr{font-size:.78rem;color:var(--muted);direction:ltr;white-space:nowrap;letter-spacing:-.02em}
+.sbtn .st{font-size:.8rem;font-weight:700;min-height:2.3em;line-height:1.15;color:var(--muted);display:flex;align-items:center;text-align:center}
+.sbtn.no{border-color:var(--bad);background:var(--bad-soft)}
+.sbtn.no .nm{text-decoration:line-through;text-decoration-thickness:2px}
+.sbtn.no .st{color:var(--bad)}
+.sbtn[disabled]{cursor:not-allowed}
+.allday{border:2px solid var(--line);background:#fff;border-radius:10px;padding:4px 10px;font-size:.85rem;margin-inline-start:auto;min-height:36px}
+.allday.on{border-color:var(--bad);color:var(--bad);background:var(--bad-soft);font-weight:700}
+.sticky{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.97);box-shadow:0 -4px 18px rgba(0,0,0,.12);padding:12px 16px calc(12px + env(safe-area-inset-bottom));z-index:30}
+.sticky .in{max-width:760px;margin:0 auto;display:flex;gap:12px;align-items:center}
+.sticky .cnt{flex:1;font-size:1.05rem}
+.sticky .cnt b{font-size:1.4rem}
+textarea.big,input.big,select.big{width:100%;border:2px solid var(--line);border-radius:12px;padding:12px;font-size:1.05rem;background:#fff}
+textarea.big{min-height:110px;resize:vertical}
+.myshift{display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.myshift:last-child{border-bottom:0}
+.myshift .date{flex:none;width:78px;text-align:center;border-radius:12px;background:#f1f2ec;padding:6px 4px}
+.myshift .date b{display:block;font-size:1.5rem;line-height:1.1}
+.myshift .date span{font-size:.8rem;color:var(--muted)}
+.myshift .info{flex:1;min-width:0}
+.myshift .info .s{font-weight:700;font-size:1.1rem}
+.house{display:inline-block;border-radius:12px;padding:6px 14px;font-weight:700;font-size:1.05rem;white-space:nowrap}
+.house.W{background:#fff;border:3px solid #8d959c;color:#2b2f33}
+.house.G{background:var(--G);border:3px solid var(--G);color:#fff}
+.success{text-align:center;padding:40px 16px}
+.success .big-ic{font-size:4.5rem}
+/* ── טפסים ── */
+.field{margin:16px 0}
+.field label.lb{display:block;font-weight:500;margin-bottom:6px;font-size:1.05rem}
+.field .req{color:var(--bad)}
+.choice{display:flex;gap:10px;flex-wrap:wrap}
+.choice button{flex:1;min-width:110px;min-height:54px;border:3px solid var(--line);background:#fff;border-radius:12px;font-weight:500}
+.choice button.on{border-color:var(--brand);background:var(--brand-soft);font-weight:700}
+.field.err input,.field.err textarea,.field.err select,.field.err .choice button{border-color:var(--bad)}
+.field .errmsg{color:var(--bad);font-size:.9rem;margin-top:4px}
+/* ── מנהל ── */
+.tabs{display:flex;gap:4px;overflow-x:auto;background:#fff;border-bottom:1px solid var(--line);padding:0 8px;position:sticky;top:68px;z-index:19;scrollbar-width:thin}
+.tabs button{border:0;background:none;padding:14px 14px;border-bottom:3px solid transparent;white-space:nowrap;font-weight:500;color:var(--muted)}
+.tabs button.on{border-bottom-color:var(--brand);color:var(--ink)}
+.tabs .cnt{background:var(--bad);color:#fff;border-radius:999px;padding:0 7px;font-size:.8rem;margin-inline-start:4px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.stat{background:#fff;border-radius:12px;padding:10px 14px;box-shadow:var(--shadow)}
+.stat b{font-size:1.5rem;display:block}
+.tablewrap{overflow-x:auto;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);-webkit-overflow-scrolling:touch}
+table.board{border-collapse:separate;border-spacing:0;width:100%;min-width:860px;font-size:.92rem}
+table.board th,table.board td{border-bottom:1px solid #eceee6;padding:4px;text-align:center}
+table.board thead th{position:sticky;top:0;background:#f7f7f2;z-index:2}
+table.board th.sM{background:var(--M-soft);color:var(--M)}
+table.board th.sE{background:var(--E-soft);color:var(--E)}
+table.board th.sN{background:var(--N-soft);color:var(--N)}
+table.board th.hW{background:#fff;border-bottom:3px solid #9aa1a8}
+table.board th.hG{background:var(--G-bg);border-bottom:3px solid var(--G)}
+table.board td.dt{text-align:start;white-space:nowrap;padding:6px 10px;min-width:150px}
+table.board td.dt .h{color:var(--muted);font-size:.82rem}
+table.board tr.sat td{background:#faf8ff}
+table.board td.sep{border-inline-start:2px solid #e2e4da}
+.cell{width:100%;min-height:44px;border-radius:10px;border:2px solid transparent;padding:4px 6px;font-size:.9rem;line-height:1.2;background:#f4f5ef}
+.cell.filled.W{background:#fff;border-color:#b9bfc4}
+.cell.filled.G{background:var(--G-bg);border-color:#9fd3b0}
+.cell.empty.cands{background:var(--warn-soft);border-color:#f0d58a;color:var(--warn);font-weight:700}
+.cell.empty.none{background:var(--bad-soft);border-color:#efb9b4;color:var(--bad)}
+.cell .wf{color:var(--warn);font-weight:700}
+.cell .nr{font-size:.75rem;color:var(--muted);display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin:8px 0}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:middle;margin-inline-end:4px}
+.glist{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.gchip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+.gchip b{color:var(--brand)}
+.reqrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid #eef0e8}
+.reqrow .when{min-width:210px;flex:1}
+.cand{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px;border:1px solid var(--line);border-radius:12px;margin:8px 0;background:#fff}
+.cand .nm{font-weight:700}
+.cand .meta{font-size:.85rem;color:var(--muted)}
+.cand .w{font-size:.85rem;color:var(--warn);width:100%}
+.cand .nt{font-size:.85rem;background:#fffbe8;border-radius:8px;padding:4px 8px;width:100%}
+.glistrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid #eef0e8}
+.glistrow .nm{font-weight:700;min-width:160px}
+.kv{display:grid;grid-template-columns:minmax(120px,200px) 1fr;gap:4px 14px;font-size:.95rem}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;word-break:break-word}
+.fieldedit{display:grid;grid-template-columns:auto 1fr 150px auto auto;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;margin:8px 0;background:#fff}
+.fieldedit input[type=text],.fieldedit select{border:1px solid var(--line);border-radius:8px;padding:8px;width:100%;background:#fff}
+.fieldedit .opts{grid-column:2 / -1}
+.fieldedit .mv{display:flex;flex-direction:column;gap:2px}
+.fieldedit .mv button{border:1px solid var(--line);background:#fff;border-radius:6px;width:32px;height:24px;padding:0;line-height:1}
+.inp{border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:#fff;min-height:42px}
+.linkbox{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#f6f7f1;border:1px dashed #bfc5b5;border-radius:12px;padding:10px;word-break:break-all;font-size:.85rem;direction:ltr;text-align:left}
+details>summary{cursor:pointer;font-weight:500;padding:6px 0}
+/* ── חלון קופץ / הודעות ── */
+.overlay{position:fixed;inset:0;background:rgba(20,30,24,.45);z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:4vh 12px;overflow-y:auto}
+.modal{background:#fff;border-radius:18px;max-width:640px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:20px;position:relative}
+.modal .x{position:absolute;top:10px;left:10px;border:0;background:#f1f2ec;border-radius:50%;width:40px;height:40px;font-size:1.2rem}
+.modal h2{padding-left:44px}
+.modal .acts{display:flex;gap:10px;justify-content:flex-start;flex-wrap:wrap;margin-top:18px}
+#busy{position:fixed;inset:0;background:rgba(255,255,255,.55);z-index:200;display:none;align-items:center;justify-content:center}
+#busy.on{display:flex}
+#busy .sp{background:#fff;border-radius:16px;padding:18px 26px;box-shadow:var(--shadow);font-size:1.1rem;display:flex;gap:12px;align-items:center}
+#busy .sp::before{content:"";width:26px;height:26px;border-radius:50%;border:4px solid var(--brand-soft);border-top-color:var(--brand);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1d2a21;color:#fff;padding:12px 20px;border-radius:12px;z-index:150;opacity:0;pointer-events:none;transition:opacity .25s;max-width:90vw}
+#toast.on{opacity:1}
+@media (max-width:600px){
+  h1{font-size:1.4rem}
+  .sbtn{min-height:84px}
+  .sbtn .nm{font-size:1rem}
+  .btn.big{width:100%}
+  .fieldedit{grid-template-columns:auto 1fr;}
+  .fieldedit .opts{grid-column:1 / -1}
+  .kv{grid-template-columns:1fr}
+  .tabs{top:64px}
+}
+@media print{
+  @page{size:A4 landscape;margin:8mm}
+  html.admin{font-size:10px}
+  body{background:#fff}
+  .topbar,.tabs,.noprint,#toast,#busy{display:none!important}
+  .tablewrap{box-shadow:none;overflow:visible}
+  table.board{min-width:0}
+  table.board thead th{position:static}
+  .cell{min-height:0;border-width:1px}
+  .printtitle{display:block!important;font-size:16px;font-weight:700;margin-bottom:6px}
+}
+.printtitle{display:none}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="busy"><div class="sp">רגע…</div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+var API_URL = 'https://script.google.com/macros/s/AKfycbxaztkLNbbUWIfs1BriVmMos6tk7vjxcVy0ruA6-vkQMuLa4epcPDefeh1sWt09QBM97A/exec';
+var BOOT = null;
+window.__loadBoot = function (done) {
+  var q = {};
+  location.search.replace(/^\?/, '').split('&').forEach(function (kv) {
+    if (!kv) return;
+    var i = kv.indexOf('=');
+    var k = decodeURIComponent(i < 0 ? kv : kv.slice(0, i));
+    q[k] = i < 0 ? '' : decodeURIComponent(kv.slice(i + 1).replace(/\+/g, ' '));
+  });
+  var app = document.getElementById('app');
+  app.innerHTML = '<div style="padding:60px 20px;text-align:center;font-size:1.4rem;color:#2f6b45">🌿 טוען…</div>';
+  var tries = 0;
+  (function go() {
+    fetch(API_URL, { method: 'POST', credentials: 'omit', redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'boot', params: q }) })
+    .then(function (r) { return r.json(); })
+    .then(function (r) {
+      if (!r || !r.ok) throw new Error((r && r.error) || 'boot');
+      BOOT = r.data; BOOT.url = location.origin + location.pathname;
+      app.innerHTML = ''; done();
+    })
+    .catch(function () {
+      if (++tries < 3) return setTimeout(go, 1500);
+      app.innerHTML = '<div style="padding:60px 20px;text-align:center;font-size:1.3rem">אין חיבור לשרת כרגע.<br><br>' +
+        '<button style="font-size:1.2rem;padding:12px 24px;border-radius:12px;border:0;background:#2f6b45;color:#fff" onclick="location.reload()">לנסות שוב</button></div>';
+    });
+  })();
+};
+</script>
+<script>
+function __main() {
+(function () {
+'use strict';
+var SHIFTS = BOOT.shifts, HOUSES = BOOT.houses;
+var SHIFT = {}, HOUSE = {};
+// בידוד כיווניות לשעות — אחרת בעברית "08:00–16:00" מוצג הפוך
+SHIFTS.forEach(function (s) { s.hours = '⁦' + s.hours.replace(/[⁦⁩]/g, '') + '⁩'; SHIFT[s.id] = s; });
+HOUSES.forEach(function (h) { HOUSE[h.id] = h; });
+var $app = document.getElementById('app');
+
+/* ═════════════ כלים כלליים ═════════════ */
+function el(tag, attrs) {
+  var n = document.createElement(tag);
+  if (attrs) Object.keys(attrs).forEach(function (k) {
+    var v = attrs[k];
+    if (v === null || v === undefined || v === false) return;
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else if (k === 'html') n.innerHTML = v;
+    else if (k.slice(0, 2) === 'on') n.addEventListener(k.slice(2), v);
+    else if (k === 'value') n.value = v;
+    else if (v === true) { n.setAttribute(k, ''); try { n[k] = true; } catch (e) {} }
+    else n.setAttribute(k, v);
+  });
+  for (var i = 2; i < arguments.length; i++) put(n, arguments[i]);
+  return n;
+}
+function put(n, c) {
+  if (c === null || c === undefined || c === false) return;
+  if (Array.isArray(c)) { c.forEach(function (x) { put(n, x); }); return; }
+  n.appendChild(typeof c === 'object' ? c : document.createTextNode(String(c)));
+}
+function clear(n) { while (n.firstChild) n.removeChild(n.firstChild); return n; }
+function ls(k, v) {
+  try {
+    if (v === undefined) return JSON.parse(localStorage.getItem('bm_' + k) || 'null');
+    if (v === null) localStorage.removeItem('bm_' + k); else localStorage.setItem('bm_' + k, JSON.stringify(v));
+  } catch (e) { return null; }
+}
+var busyN = 0;
+function busy(on, text) {
+  busyN += on ? 1 : -1; if (busyN < 0) busyN = 0;
+  var b = document.getElementById('busy');
+  b.querySelector('.sp').textContent = text || 'רגע…';
+  b.classList.toggle('on', busyN > 0);
+}
+var toastT;
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 3200);
+}
+function call(action, payload) {
+  if (window.API_URL) {
+    return fetch(window.API_URL, {
+      method: 'POST', credentials: 'omit', redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: action, auth: BOOT.auth || '', payload: payload || {} })
+    }).then(function (res) { return res.json(); }, function () {
+      throw new Error('אין חיבור לשרת. בדקו את החיבור לאינטרנט ונסו שוב.');
+    }).then(function (r) {
+      if (r && r.ok) return r.data;
+      throw new Error((r && r.error) || 'אירעה תקלה');
+    });
+  }
+  return new Promise(function (resolve, reject) {
+    if (!window.google || !google.script || !google.script.run) return reject(new Error('המערכת לא זמינה כרגע'));
+    google.script.run
+      .withSuccessHandler(function (r) { if (r && r.ok) resolve(r.data); else reject(new Error((r && r.error) || 'אירעה תקלה')); })
+      .withFailureHandler(function () { reject(new Error('אין חיבור לשרת. בדקו את החיבור לאינטרנט ונסו שוב.')); })
+      .api(action, BOOT.auth || '', payload || {});
+  });
+}
+/** קריאה עם חיווי טעינה והודעת שגיאה ידידותית. מחזיר null בשגיאה. */
+function run(action, payload, text) {
+  busy(true, text);
+  return call(action, payload).then(function (d) { busy(false); return d; }, function (e) {
+    busy(false); alertBox(e.message); return null;
+  });
+}
+function modal(title, body, actions, opts) {
+  opts = opts || {};
+  var ov = el('div', { class: 'overlay', role: 'dialog', 'aria-modal': 'true' });
+  var close = function () { if (ov.parentNode) ov.parentNode.removeChild(ov); document.removeEventListener('keydown', onKey); if (opts.onClose) opts.onClose(); };
+  var onKey = function (e) { if (e.key === 'Escape') close(); };
+  var m = el('div', { class: 'modal' },
+    el('button', { class: 'x', 'aria-label': 'סגירה', onclick: close }, '✕'),
+    title ? el('h2', { text: title }) : null, body,
+    actions && actions.length ? el('div', { class: 'acts' }, actions.map(function (a) {
+      return el('button', { class: 'btn ' + (a.cls || ''), onclick: function () { if (a.fn && a.fn() === false) return; if (!a.keep) close(); } }, a.label);
+    })) : null);
+  ov.appendChild(m);
+  ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+  document.addEventListener('keydown', onKey);
+  document.body.appendChild(ov);
+  var f = m.querySelector('.acts .btn') || m.querySelector('.x'); if (f && !opts.noFocus) f.focus();
+  return close;
+}
+function alertBox(msg) { modal('שימו לב', el('p', { style: 'font-size:1.15rem', text: msg }), [{ label: 'הבנתי', cls: 'primary' }]); }
+function confirmBox(title, msg, okLabel, okCls) {
+  return new Promise(function (res) {
+    var done = false;
+    modal(title, el('p', { style: 'font-size:1.1rem', text: msg }), [
+      { label: okLabel || 'אישור', cls: okCls || 'primary', fn: function () { done = true; res(true); } },
+      { label: 'ביטול', cls: 'ghost' }
+    ], { onClose: function () { if (!done) res(false); } });
+  });
+}
+function copyText(txt) {
+  var ok = function () { toast('הועתק ✓'); };
+  var fallback = function () {
+    var ta = el('textarea', { style: 'position:fixed;top:-1000px' }); ta.value = txt; document.body.appendChild(ta); ta.select();
+    var good = false; try { good = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    if (good) ok(); else modal('העתקה', el('div', {}, el('p', { text: 'סמנו והעתיקו:' }), el('textarea', { class: 'big', value: txt, readonly: true, onfocus: function (e) { e.target.select(); } })), [{ label: 'סגירה' }]);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, fallback); else fallback();
+}
+function waUrl(phone, text) {
+  var d = String(phone || '').replace(/\D/g, '');
+  if (d.charAt(0) === '0') d = '972' + d.slice(1);
+  return 'https://wa.me/' + d + '?text=' + encodeURIComponent(text);
+}
+function openWa(phone, text) { window.open(phone ? waUrl(phone, text) : 'https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener'); }
+
+/* ═════════════ תאריכים: לועזי + עברי + חגים ═════════════ */
+var DAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+var DAYS_S = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'];
+var GM = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
+var HM = { Tishri: 'תשרי', Tishrei: 'תשרי', Heshvan: 'חשוון', Cheshvan: 'חשוון', Marcheshvan: 'חשוון', Kislev: 'כסלו', Tevet: 'טבת', Shevat: 'שבט',
+  'Adar I': 'אדר א׳', 'Adar II': 'אדר ב׳', Adar: 'אדר', Nisan: 'ניסן', Iyar: 'אייר', Sivan: 'סיוון', Tamuz: 'תמוז', Tammuz: 'תמוז', Av: 'אב', Elul: 'אלול' };
+var HFMT = null;
+try { HFMT = new Intl.DateTimeFormat('en-u-ca-hebrew', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }); } catch (e) {}
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+function D(ds) { return new Date(Date.UTC(+ds.slice(0, 4), +ds.slice(5, 7) - 1, +ds.slice(8, 10))); }
+function addDays(ds, n) { var d = D(ds); d.setUTCDate(d.getUTCDate() + n); return d.getUTCFullYear() + '-' + pad2(d.getUTCMonth() + 1) + '-' + pad2(d.getUTCDate()); }
+function dow(ds) { return D(ds).getUTCDay(); }
+function todayStr() { var d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+function monthDates(m) { var out = [], n = new Date(Date.UTC(+m.slice(0, 4), +m.slice(5, 7), 0)).getUTCDate(); for (var i = 1; i <= n; i++) out.push(m + '-' + pad2(i)); return out; }
+function gDate(ds) { return (+ds.slice(8, 10)) + ' ב' + GM[+ds.slice(5, 7) - 1]; }
+function gShort(ds) { return (+ds.slice(8, 10)) + '.' + (+ds.slice(5, 7)); }
+function monthTitle(m) { return GM[+m.slice(5, 7) - 1] + ' ' + m.slice(0, 4); }
+function gem(n) {
+  var T = [[400, 'ת'], [300, 'ש'], [200, 'ר'], [100, 'ק'], [90, 'צ'], [80, 'פ'], [70, 'ע'], [60, 'ס'], [50, 'נ'], [40, 'מ'], [30, 'ל'], [20, 'כ'], [10, 'י'], [9, 'ט'], [8, 'ח'], [7, 'ז'], [6, 'ו'], [5, 'ה'], [4, 'ד'], [3, 'ג'], [2, 'ב'], [1, 'א']];
+  var s = '';
+  T.forEach(function (p) { while (n >= p[0]) { s += p[1]; n -= p[0]; } });
+  s = s.replace(/יה$/, 'טו').replace(/יו$/, 'טז');
+  return s.length === 1 ? s + '׳' : s.slice(0, -1) + '״' + s.slice(-1);
+}
+var HC = {};
+function hp(ds) {
+  if (HC[ds]) return HC[ds];
+  var o = { d: 0, m: '', y: 0 };
+  if (HFMT) { HFMT.formatToParts(D(ds)).forEach(function (p) { if (p.type === 'day') o.d = +p.value; else if (p.type === 'month') o.m = p.value; else if (p.type === 'year' || p.type === 'relatedYear') o.y = +p.value; }); }
+  return (HC[ds] = o);
+}
+function hDate(ds) { var p = hp(ds); return p.d ? gem(p.d) + ' ב' + (HM[p.m] || p.m) : ''; }
+function hYear(ds) { var p = hp(ds); return p.y ? gem(p.y % 1000) : ''; }
+function hMonthRange(m) {
+  var ds = monthDates(m), a = hp(ds[0]), b = hp(ds[ds.length - 1]);
+  if (!a.d) return '';
+  var s = HM[a.m] || a.m;
+  if (b.m !== a.m) s += '–' + (HM[b.m] || b.m);
+  return s + ' ' + hYear(ds[ds.length - 1]);
+}
+function mod7(x) { return ((x % 7) + 7) % 7; }
+function holiday(ds) {
+  var p = hp(ds); if (!p.d) return '';
+  var d = p.d, m = p.m, w = dow(ds);
+  if (m === 'Tishri' || m === 'Tishrei') {
+    if (d === 1 || d === 2) return 'ראש השנה';
+    if ((d === 3 && w !== 6) || (d === 4 && w === 0)) return 'צום גדליה';
+    if (d === 9) return 'ערב יום כיפור'; if (d === 10) return 'יום כיפור';
+    if (d === 14) return 'ערב סוכות'; if (d === 15) return 'סוכות';
+    if (d >= 16 && d <= 20) return 'חול המועד סוכות';
+    if (d === 21) return 'הושענא רבה'; if (d === 22) return 'שמחת תורה';
+  }
+  for (var k = 0; k < 8; k++) { var q = hp(addDays(ds, -k)); if (q.m === 'Kislev' && q.d === 25) return 'חנוכה – נר ' + gem(k + 1); }
+  if (m === 'Tevet' && d === 10) return 'עשרה בטבת';
+  if (m === 'Shevat' && d === 15) return 'ט״ו בשבט';
+  if (m === 'Adar' || m === 'Adar II') { if (d === 14) return 'פורים'; if (d === 15) return 'שושן פורים'; }
+  if (m === 'Nisan') {
+    if (d === 14) return 'ערב פסח'; if (d === 15) return 'פסח';
+    if (d >= 16 && d <= 20) return 'חול המועד פסח'; if (d === 21) return 'שביעי של פסח';
+    if (d >= 26 && d <= 28) { var w27 = mod7(w + 27 - d), t = w27 === 5 ? 26 : (w27 === 0 ? 28 : 27); if (d === t) return 'יום השואה'; }
+  }
+  if (m === 'Iyar') {
+    var w5 = mod7(w + 5 - d), at = w5 === 5 ? 4 : (w5 === 6 ? 3 : (w5 === 1 ? 6 : 5));
+    if (d === at - 1) return 'יום הזיכרון'; if (d === at) return 'יום העצמאות';
+    if (d === 18) return 'ל״ג בעומר'; if (d === 28) return 'יום ירושלים';
+  }
+  if (m === 'Sivan') { if (d === 5) return 'ערב שבועות'; if (d === 6) return 'שבועות'; }
+  if (m === 'Av') { if ((d === 9 && w !== 6) || (d === 10 && w === 0)) return 'תשעה באב'; }
+  if (m === 'Elul' && d === 29) return 'ערב ראש השנה';
+  return '';
+}
+function dayLabel(ds) { return 'יום ' + DAYS[dow(ds)] + ', ' + gDate(ds); }
+function stamp(iso) { if (!iso) return ''; var d = iso.slice(0, 10); return gShort(d) + ' בשעה ' + iso.slice(11, 16); }
+function shiftLine(sh) { var s = SHIFT[sh]; return s.icon + ' ' + s.name + ' ' + s.hours; }
+
+/* ═════════════ גודל גופן (למדריכים) ═════════════ */
+function applyFont() { var f = ls('font') || 18; document.documentElement.style.fontSize = f + 'px'; }
+function fontButtons() {
+  var set = function (d) { var f = (ls('font') || 18) + d; f = Math.max(16, Math.min(26, f)); ls('font', f); applyFont(); };
+  return [el('button', { class: 'fontbtn', 'aria-label': 'הגדלת הכתב', onclick: function () { set(2); } }, 'א+'),
+          el('button', { class: 'fontbtn', 'aria-label': 'הקטנת הכתב', onclick: function () { set(-2); } }, 'א-')];
+}
+function topbar(extra) {
+  return el('div', { class: 'topbar' }, el('div', { class: 'logo' }, '🌿 בית מאזן בטבע', el('small', { text: '· משמרות' })), extra);
+}
+
+/* ═════════════ מסך מדריך ═════════════ */
+var G = null; // { data, sel: {month: {key:1}}, notes: {}, dirty: {} }
+
+function guideStart() {
+  applyFont();
+  clear($app).appendChild(el('div', {}, topbar(fontButtons()), el('div', { class: 'wrap' }, el('p', { class: 'muted', style: 'margin-top:30px' }, 'טוען…'))));
+  run('guideBoot', {}, 'טוען את המשמרות…').then(function (d) {
+    if (!d) { renderGuideError(); return; }
+    G = { data: d, sel: {}, notes: {}, dirty: {} };
+    d.months.forEach(function (m) { initSel(m); });
+    renderGuide();
+  });
+  window.addEventListener('beforeunload', function (e) {
+    if (G && Object.keys(G.dirty).some(function (k) { return G.dirty[k]; })) { e.preventDefault(); e.returnValue = ''; }
+  });
+}
+function initSel(m) {
+  var s = {};
+  (m.blocks || []).forEach(function (k) { s[k] = 1; });
+  G.sel[m.month] = s; G.notes[m.month] = m.note || ''; G.dirty[m.month] = false;
+}
+function renderGuideError() {
+  clear($app).appendChild(el('div', {}, topbar(fontButtons()), el('div', { class: 'wrap' },
+    el('div', { class: 'card', style: 'margin-top:30px;text-align:center' }, el('div', { style: 'font-size:3rem' }, '🔗'),
+      el('h2', { text: 'לא הצלחנו לפתוח את הקישור' }),
+      el('p', { text: 'נא לבדוק את החיבור לאינטרנט ולנסות שוב. אם זה חוזר — לפנות למנהל לקבלת קישור חדש.' }),
+      el('button', { class: 'btn big primary', onclick: guideStart }, 'לנסות שוב')))));
+}
+function renderGuide() {
+  var d = G.data, wrap = el('div', { class: 'wrap' });
+  var first = d.guide.firstName || '';
+  wrap.appendChild(el('h1', { text: 'שלום ' + first + ' 👋' }));
+  var order = { open: 0, published: 1, closed: 2 };
+  var months = d.months.slice().sort(function (a, b) { return order[a.status] - order[b.status] || (a.month < b.month ? -1 : 1); });
+  if (!months.length) {
+    wrap.appendChild(el('div', { class: 'card' }, el('h2', { text: 'אין כרגע חודש פתוח להגשה' }),
+      el('p', { text: 'כשתיפתח הגשה לחודש חדש — תקבלו הודעה בוואטסאפ עם הקישור הזה.' })));
+  }
+  var openMonth = null;
+  months.forEach(function (m) {
+    if (m.status === 'open' && !openMonth) { openMonth = m; wrap.appendChild(renderOpenMonth(m)); }
+    else if (m.status === 'open') wrap.appendChild(el('div', { class: 'card' }, el('h2', { text: 'גם ' + monthTitle(m.month) + ' פתוח להגשה' }),
+      el('button', { class: 'btn primary', onclick: function () { G.focus = m.month; renderGuideFocus(m); } }, 'לסימון ' + monthTitle(m.month))));
+    else if (m.status === 'published') wrap.appendChild(renderPublished(m));
+    else wrap.appendChild(renderClosed(m));
+  });
+  wrap.appendChild(el('p', { class: 'muted', style: 'text-align:center;margin-top:30px;font-size:.9rem' }, 'שאלות? פנו למנהל. הקישור הזה אישי — לא להעביר לאחרים.'));
+  var root = el('div', {}, topbar(fontButtons()), wrap);
+  if (openMonth) root.appendChild(stickyBar(openMonth));
+  clear($app).appendChild(root);
+}
+function renderGuideFocus(m) {
+  var wrap = el('div', { class: 'wrap' }, el('button', { class: 'btn ghost', style: 'margin-top:14px', onclick: renderGuide }, '→ חזרה'), renderOpenMonth(m));
+  clear($app).appendChild(el('div', {}, topbar(fontButtons()), wrap, stickyBar(m)));
+  window.scrollTo(0, 0);
+}
+function monthHeader(m, prefix) {
+  return [el('h2', { text: prefix + monthTitle(m.month) }), el('div', { class: 'muted', text: hMonthRange(m.month) })];
+}
+var NO_TXT = '⛔ לא לשבץ למשמרת';
+function renderOpenMonth(m) {
+  var box = el('div', {});
+  var sel = G.sel[m.month];
+  var head = el('div', { class: 'card' }, monthHeader(m, '📝 מתי אי אפשר לשבץ אותי — '));
+  if (m.deadline) head.appendChild(el('p', { style: 'font-size:1.1rem;margin:10px 0 0' }, '⏰ נא לשלוח עד ', el('b', { text: dayLabel(m.deadline) })));
+  if (m.submittedAt) head.appendChild(el('div', { class: 'notice ok' }, '✓ שלחתם (' + stamp(m.submittedAt) + '). אפשר לשנות ולשלוח שוב עד סגירת ההגשה.'));
+  head.appendChild(el('ol', { class: 'steps', style: 'margin-top:14px' },
+    el('li', {}, el('span', {}, 'לוחצים רק על משמרת שבה ', el('b', { text: 'אי אפשר' }), ' לעבוד. היא תהפוך לאדומה ותופיע: ', el('b', { style: 'color:var(--bad)', text: NO_TXT }))),
+    el('li', { text: 'לחיצה נוספת מבטלת. כל משמרת שלא סומנה — אפשר לשבץ אתכם בה.' }),
+    el('li', {}, el('span', {}, 'בסוף לוחצים על הכפתור הירוק ', el('b', { text: '״שליחה למנהל״' }), ' שבתחתית המסך — גם אם אפשר לשבץ אתכם בכל המשמרות.'))));
+  head.appendChild(el('p', { class: 'muted', style: 'margin:6px 0 0' }, 'מתי ובאיזה בית (לבן או ירוק) — המנהל מחליט ומשבץ.'));
+  box.appendChild(head);
+  var today = todayStr();
+  monthDates(m.month).forEach(function (ds) {
+    var past = ds < today, hol = holiday(ds), w = dow(ds);
+    var paints = [];
+    var allBtn = past ? null : el('button', { class: 'allday', type: 'button' });
+    var paintAll = function () {
+      if (!allBtn) return;
+      var all = SHIFTS.every(function (s) { return sel[ds + '|' + s.id]; });
+      allBtn.classList.toggle('on', all);
+      allBtn.textContent = all ? '⛔ כל היום לא' : 'כל היום לא';
+      allBtn.setAttribute('aria-pressed', all ? 'true' : 'false');
+    };
+    var card = el('div', { class: 'day' + (w === 6 ? ' sat' : '') + (past ? ' past' : '') },
+      el('div', { class: 'dayhead' }, el('span', { class: 'dname', text: 'יום ' + DAYS[w] }), el('span', { class: 'gdate', text: gDate(ds) }),
+        el('span', { class: 'hdate', text: hDate(ds) }), hol ? el('span', { class: 'badge hol', text: hol }) : null, allBtn));
+    var grid = el('div', { class: 'shiftbtns' });
+    SHIFTS.forEach(function (s) {
+      var key = ds + '|' + s.id;
+      var b = el('button', { class: 'sbtn', type: 'button', disabled: past, 'aria-pressed': sel[key] ? 'true' : 'false',
+        'aria-label': 'יום ' + DAYS[w] + ' ' + gDate(ds) + ', משמרת ' + s.name + ' ' + s.hours },
+        el('span', { class: 'ic', text: s.icon }), el('span', { class: 'nm', text: s.name }), el('span', { class: 'hr', text: s.hours }), el('span', { class: 'st' }));
+      var paint = function () {
+        var no = !!sel[key];
+        b.classList.toggle('no', no);
+        b.setAttribute('aria-pressed', no ? 'true' : 'false');
+        b.querySelector('.st').textContent = past ? '' : (no ? NO_TXT : 'אפשר לשבץ');
+      };
+      paints.push(paint);
+      b.addEventListener('click', function () {
+        if (past) return;
+        if (sel[key]) delete sel[key]; else sel[key] = 1;
+        G.dirty[m.month] = true; paint(); paintAll(); updateSticky(m);
+        if (navigator.vibrate) try { navigator.vibrate(15); } catch (e) {}
+      });
+      paint(); grid.appendChild(b);
+    });
+    if (allBtn) {
+      allBtn.addEventListener('click', function () {
+        var all = SHIFTS.every(function (s) { return sel[ds + '|' + s.id]; });
+        SHIFTS.forEach(function (s) { if (all) delete sel[ds + '|' + s.id]; else sel[ds + '|' + s.id] = 1; });
+        G.dirty[m.month] = true; paints.forEach(function (p) { p(); }); paintAll(); updateSticky(m);
+      });
+      paintAll();
+    }
+    card.appendChild(grid); box.appendChild(card);
+  });
+  var ta = el('textarea', { class: 'big', id: 'note-' + m.month, placeholder: 'לדוגמה: מעדיף לילות / לא יותר מ-2 משמרות בשבוע / אפשר להתקשר אליי…', maxlength: '2000' });
+  ta.value = G.notes[m.month] || '';
+  ta.addEventListener('input', function () { G.notes[m.month] = ta.value; G.dirty[m.month] = true; });
+  box.appendChild(el('div', { class: 'card' }, el('label', { for: 'note-' + m.month }, el('h3', { text: '✍️ הערות למנהל (לא חובה)' })), ta));
+  return box;
+}
+function stickyBar(m) {
+  var bar = el('div', { class: 'sticky', id: 'sticky' }, el('div', { class: 'in' },
+    el('div', { class: 'cnt', id: 'stickycnt' }),
+    el('button', { class: 'btn big ok', style: 'width:auto', onclick: function () { submitMonth(m); } }, '📨 שליחה למנהל')));
+  setTimeout(function () { updateSticky(m); }, 0);
+  return bar;
+}
+function updateSticky(m) {
+  var c = document.getElementById('stickycnt'); if (!c) return;
+  var n = Object.keys(G.sel[m.month] || {}).length;
+  clear(c).appendChild(n ? el('span', {}, '⛔ לא לשבץ: ', el('b', { text: String(n) }), ' משמרות') : el('span', { text: 'לא סומנו משמרות "לא לשבץ"' }));
+}
+function submitMonth(m) {
+  var slots = Object.keys(G.sel[m.month] || {});
+  var go = function () {
+    run('guideSubmit', { month: m.month, slots: slots, note: G.notes[m.month] || '' }, 'שולח למנהל…').then(function (res) {
+      if (!res) return;
+      for (var i = 0; i < G.data.months.length; i++) if (G.data.months[i].month === m.month) G.data.months[i] = res;
+      initSel(res);
+      showSent(res, slots.length);
+    });
+  };
+  if (!slots.length) confirmBox('לא סימנתם אף משמרת', 'לא סימנתם אף משמרת "לא לשבץ" — כלומר אפשר לשבץ אתכם בכל המשמרות בחודש. לשלוח כך?', 'כן, לשלוח', 'primary').then(function (y) { if (y) go(); });
+  else go();
+}
+function showSent(m, n) {
+  window.scrollTo(0, 0);
+  clear($app).appendChild(el('div', {}, topbar(fontButtons()), el('div', { class: 'wrap' }, el('div', { class: 'card success' },
+    el('div', { class: 'big-ic', text: '✅' }), el('h1', { text: 'נשלח בהצלחה!' }),
+    el('p', { style: 'font-size:1.2rem' }, n ? 'עדכנתם שאין לשבץ אתכם ב-' + n + ' משמרות ב' + monthTitle(m.month) + '.' : 'עדכנתם שאפשר לשבץ אתכם בכל המשמרות ב' + monthTitle(m.month) + '.'),
+    el('p', { style: 'font-size:1.1rem', text: 'המנהל ישבץ לפי זה. כשהשיבוץ יפורסם תקבלו הודעה בוואטסאפ, ותוכלו לראות אותו גם כאן.' }),
+    el('button', { class: 'btn big primary', onclick: renderGuide }, 'חזרה למסך הראשי')))));
+}
+function blockList(keys) {
+  var box = el('div');
+  keys.forEach(function (k) {
+    var p = k.split('|');
+    box.appendChild(el('div', { class: 'myshift' }, dateBlock(p[0]), el('div', { class: 'info' }, el('div', { class: 's', text: shiftLine(p[1]) }), el('div', { style: 'color:var(--bad);font-weight:700', text: NO_TXT }))));
+  });
+  return box;
+}
+function renderClosed(m) {
+  var card = el('div', { class: 'card' }, monthHeader(m, '⏳ '));
+  card.appendChild(el('div', { class: 'notice info', style: 'font-size:1.05rem' }, 'ההגשה נסגרה. המנהל משבץ עכשיו — תקבלו הודעה כשהשיבוץ יפורסם.'));
+  if (!m.submittedAt) card.appendChild(el('p', { text: 'לא נשלח עדכון לחודש הזה.' }));
+  else if (m.blocks.length) {
+    card.appendChild(el('details', {}, el('summary', { text: 'המשמרות שסימנתם "לא לשבץ" (' + m.blocks.length + ')' }), blockList(m.blocks)));
+  } else card.appendChild(el('p', { text: 'עדכנתם שאפשר לשבץ אתכם בכל המשמרות.' }));
+  return card;
+}
+function dateBlock(ds) {
+  var hol = holiday(ds);
+  return el('div', { class: 'date' }, el('span', { text: 'יום ' + DAYS_S[dow(ds)] }), el('b', { text: String(+ds.slice(8, 10)) }),
+    el('span', { text: GM[+ds.slice(5, 7) - 1] }), el('span', { style: 'display:block', text: hDate(ds) }), hol ? el('span', { class: 'badge hol', style: 'font-size:.7rem;white-space:normal', text: hol }) : null);
+}
+function renderPublished(m) {
+  var card = el('div', { class: 'card' }, monthHeader(m, '✅ המשמרות שלי — '));
+  var ok = m.shifts || [];
+  if (ok.length) {
+    card.appendChild(el('div', { class: 'notice ok', style: 'font-size:1.1rem' }, 'שובצתם ל-', el('b', { text: String(ok.length) }), ' משמרות החודש:'));
+    var today = todayStr();
+    ok.forEach(function (it) {
+      card.appendChild(el('div', { class: 'myshift', style: it.date < today ? 'opacity:.5' : '' }, dateBlock(it.date),
+        el('div', { class: 'info' }, el('div', { class: 's', text: SHIFT[it.shift].icon + ' ' + SHIFT[it.shift].name }),
+          el('div', { class: 'muted', style: 'direction:ltr;text-align:right', text: SHIFT[it.shift].hours })),
+        el('span', { class: 'house ' + it.house, text: HOUSE[it.house].name })));
+    });
+  } else card.appendChild(el('div', { class: 'notice warn', style: 'font-size:1.1rem', text: 'לא שובצתם למשמרות בחודש הזה.' }));
+  return card;
+}
+
+/* ═════════════ טופס הרשמה ═════════════ */
+function fieldInput(f, value, onChange) {
+  var wrap = el('div', { class: 'field', 'data-key': f.key });
+  var id = 'f_' + f.key;
+  wrap.appendChild(el('label', { class: 'lb', for: id }, f.label, f.required ? el('span', { class: 'req', text: ' *' }) : null));
+  var inp;
+  if (f.type === 'textarea') { inp = el('textarea', { class: 'big', id: id, maxlength: '2000' }); inp.value = value || ''; }
+  else if (f.type === 'yesno' || (f.type === 'select' && f.options.split('|').length <= 4)) {
+    var opts = f.type === 'yesno' ? ['כן', 'לא'] : f.options.split('|');
+    inp = el('div', { class: 'choice', id: id, role: 'radiogroup' });
+    var cur = value || '';
+    var btns = opts.map(function (o) {
+      return el('button', { type: 'button', role: 'radio', 'aria-checked': cur === o ? 'true' : 'false', class: cur === o ? 'on' : '', onclick: function () {
+        cur = cur === o && !f.required ? '' : o; btns.forEach(function (b) { var on = b.textContent === cur; b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false'); }); onChange(f.key, cur);
+        wrap.classList.remove('err'); var em = wrap.querySelector('.errmsg'); if (em) em.remove();
+      } }, o);
+    });
+    put(inp, btns);
+    wrap.appendChild(inp); return wrap;
+  } else if (f.type === 'select') {
+    inp = el('select', { class: 'big', id: id }, el('option', { value: '' }, '— בחירה —'), f.options.split('|').map(function (o) { return el('option', { value: o }, o); }));
+    inp.value = value || '';
+  } else {
+    var t = { tel: 'tel', email: 'email', date: 'date', number: 'text', idnum: 'text' }[f.type] || 'text';
+    inp = el('input', { class: 'big', id: id, type: t, autocomplete: { firstName: 'given-name', lastName: 'family-name', phone: 'tel', email: 'email' }[f.key] || 'off',
+      inputmode: f.type === 'tel' || f.type === 'idnum' || f.type === 'number' ? 'numeric' : null, maxlength: '300', dir: f.type === 'tel' || f.type === 'email' ? 'ltr' : null });
+    inp.value = value || '';
+  }
+  inp.addEventListener('input', function () { onChange(f.key, inp.value); wrap.classList.remove('err'); var e = wrap.querySelector('.errmsg'); if (e) e.remove(); });
+  inp.addEventListener('change', function () { onChange(f.key, inp.value); });
+  wrap.appendChild(inp);
+  return wrap;
+}
+function markMissing(container, fields, answers) {
+  var firstBad = null;
+  fields.forEach(function (f) {
+    var w = container.querySelector('[data-key="' + f.key + '"]'); if (!w) return;
+    w.classList.remove('err'); var e = w.querySelector('.errmsg'); if (e) e.remove();
+    if (f.required && !String(answers[f.key] || '').trim()) {
+      w.classList.add('err'); w.appendChild(el('div', { class: 'errmsg', text: 'נא למלא את השדה הזה' }));
+      if (!firstBad) firstBad = w;
+    }
+  });
+  if (firstBad) { firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' }); return false; }
+  return true;
+}
+function registerStart() {
+  applyFont();
+  clear($app).appendChild(el('div', {}, topbar(fontButtons()), el('div', { class: 'wrap' }, el('p', { class: 'muted', style: 'margin-top:30px' }, 'טוען…'))));
+  run('regForm', {}, 'טוען את הטופס…').then(function (d) { if (d) renderRegister(d.fields); });
+}
+function renderRegister(fields) {
+  var answers = ls('regdraft') || {};
+  var onChange = function (k, v) { answers[k] = v; ls('regdraft', answers); };
+  var errBox = el('div');
+  var form = el('form', { novalidate: true, onsubmit: function (e) { e.preventDefault(); send(); } });
+  fields.forEach(function (f) { form.appendChild(fieldInput(f, answers[f.key], onChange)); });
+  form.appendChild(el('button', { class: 'btn big ok', type: 'submit', style: 'margin-top:10px' }, '📨 שליחת הפרטים'));
+  var send = function () {
+    form.querySelectorAll('input,textarea,select').forEach(function (i) { var k = i.id.replace(/^f_/, ''); if (k) answers[k] = i.value; });
+    clear(errBox);
+    if (!markMissing(form, fields, answers)) return;
+    run('register', { answers: answers }, 'שולח את הפרטים…').then(function (r) {
+      if (!r) return;
+      ls('regdraft', null);
+      window.scrollTo(0, 0);
+      clear($app).appendChild(el('div', {}, topbar(fontButtons()), el('div', { class: 'wrap' }, el('div', { class: 'card success' },
+        el('div', { class: 'big-ic', text: '🎉' }), el('h1', { text: 'תודה ' + (r.firstName || '') + '!' }),
+        el('p', { style: 'font-size:1.2rem', text: 'הפרטים נשלחו למנהל.' }),
+        el('p', { style: 'font-size:1.1rem', text: 'אחרי האישור תקבלו בוואטסאפ קישור אישי למערכת המשמרות.' })))));
+    });
+  };
+  clear($app).appendChild(el('div', {}, topbar(fontButtons()), el('div', { class: 'wrap' },
+    el('h1', { text: 'הרשמה למערכת המשמרות' }), el('p', { class: 'muted', style: 'font-size:1.05rem' }, 'נא למלא את הפרטים. שדות עם ', el('span', { class: 'req', style: 'color:var(--bad)' }, '*'), ' הם חובה.'),
+    errBox, el('div', { class: 'card' }, form))));
+}
+
+/* ═════════════ פאנל מנהל ═════════════ */
+var A = { tab: 'board', month: null, months: [], fields: [], pending: 0, board: null, guides: null, today: '' };
+
+function adminStart() {
+  document.documentElement.classList.add('admin');
+  run('adminBoot', {}, 'טוען…').then(function (d) {
+    if (!d) return;
+    A.months = d.months; A.fields = d.fields; A.pending = d.pending; A.today = d.today;
+    var saved = ls('admin_month');
+    var cands = A.months.map(function (m) { return m.month; });
+    A.month = cands.indexOf(saved) >= 0 ? saved : pickDefaultMonth();
+    A.tab = ls('admin_tab') || 'board';
+    renderAdmin();
+  });
+}
+function pickDefaultMonth() {
+  if (!A.months.length) return null;
+  var cur = A.today.slice(0, 7);
+  var future = A.months.filter(function (m) { return m.month >= cur; });
+  var notPub = future.filter(function (m) { return m.status !== 'published'; });
+  return (notPub[0] || future[0] || A.months[A.months.length - 1]).month;
+}
+function monthObj(m) { for (var i = 0; i < A.months.length; i++) if (A.months[i].month === m) return A.months[i]; return null; }
+var STATUS_HE = { open: 'פתוח להגשה', closed: 'ההגשה נסגרה – בשיבוץ', published: 'פורסם למדריכים' };
+function statusBadge(st) { return el('span', { class: 'badge ' + st, text: STATUS_HE[st] || st }); }
+function regLink() { return BOOT.url + '?reg=1'; }
+function guideLink(g) { return BOOT.url + '?t=' + g.token; }
+
+function renderAdmin() {
+  var tabs = [['board', '📅 לוח שיבוץ'], ['requests', '🗓 זמינות לפי מדריך'], ['guides', '👥 מדריכים'], ['form', '📝 טופס הרשמה'], ['months', '📣 חודשים והודעות']];
+  var tabbar = el('div', { class: 'tabs', role: 'tablist' }, tabs.map(function (t) {
+    return el('button', { role: 'tab', class: A.tab === t[0] ? 'on' : '', 'aria-selected': A.tab === t[0] ? 'true' : 'false', onclick: function () { A.tab = t[0]; ls('admin_tab', t[0]); renderAdmin(); } },
+      t[1], t[0] === 'guides' && A.pending ? el('span', { class: 'cnt', text: String(A.pending) }) : null);
+  }));
+  var body = el('div', { class: 'wrap', id: 'adminbody' });
+  clear($app).appendChild(el('div', {}, topbar(el('span', { style: 'opacity:.85;font-size:.85rem' }, 'פאנל מנהל')), tabbar, body));
+  ({ board: tabBoard, requests: tabRequests, guides: tabGuides, form: tabForm, months: tabMonths })[A.tab](body);
+}
+function monthPicker(onChange) {
+  if (!A.months.length) return null;
+  var s = el('select', { class: 'inp', 'aria-label': 'בחירת חודש', onchange: function () { A.month = s.value; ls('admin_month', s.value); A.board = null; onChange(); } },
+    A.months.map(function (m) { return el('option', { value: m.month }, monthTitle(m.month) + ' · ' + hMonthRange(m.month) + ' — ' + STATUS_HE[m.status]); }));
+  s.value = A.month;
+  return s;
+}
+function noMonths(body) {
+  body.appendChild(el('div', { class: 'card', style: 'margin-top:20px' }, el('h2', { text: 'עדיין לא נפתח חודש' }),
+    el('p', { text: 'כדי שהמדריכים יבחרו משמרות, פתחו חודש להגשה.' }),
+    el('button', { class: 'btn primary', onclick: function () { A.tab = 'months'; renderAdmin(); } }, 'לפתיחת חודש')));
+}
+function loadBoard(force) {
+  if (A.board && !force && A.board.month.month === A.month) return Promise.resolve(A.board);
+  return run('adminBoard', { month: A.month }, 'טוען את החודש…').then(function (b) { if (b) { A.board = b; updateMonth(b.month); } return b; });
+}
+function updateMonth(m) { for (var i = 0; i < A.months.length; i++) if (A.months[i].month === m.month) A.months[i] = m; }
+/** פעולה על הלוח: מבצע ואז רענון הלוח */
+function boardAction(action, payload, text) {
+  return run(action, payload, text).then(function (r) {
+    if (!r) return null;
+    return loadBoard(true).then(function () { return r; });
+  });
+}
+function idx(b) {
+  var gById = {}, occ = {}, count = {}, notes = {}, blocked = {}, blockN = {}, mine = {};
+  b.guides.forEach(function (g) { gById[g.id] = g; });
+  b.assignments.forEach(function (r) {
+    occ[r.date + '|' + r.shift + '|' + r.house] = r;
+    count[r.guideId] = (count[r.guideId] || 0) + 1;
+    (mine[r.guideId] = mine[r.guideId] || []).push(r);
+  });
+  b.blocks.forEach(function (x) { blocked[x.guideId + '|' + x.date + '|' + x.shift] = 1; blockN[x.guideId] = (blockN[x.guideId] || 0) + 1; });
+  b.notes.forEach(function (n) { if (n.submittedAt) notes[n.guideId] = n; });
+  var active = b.guides.filter(function (g) { return g.status === 'active'; });
+  var slotsN = monthDates(b.month.month).length * 3;
+  return { gById: gById, occ: occ, count: count, notes: notes, blocked: blocked, blockN: blockN, mine: mine, active: active, slotsN: slotsN,
+    submitted: active.filter(function (g) { return notes[g.id]; }), missing: active.filter(function (g) { return !notes[g.id]; }),
+    all: b.assignments.concat(b.edges) };
+}
+function isBlk(I, gid, ds, sh) { return !!I.blocked[gid + '|' + ds + '|' + sh]; }
+function availN(I, gid) { return I.slotsN - (I.blockN[gid] || 0); }
+/** מדריכים פנויים למשבצת: הגישו, לא חסמו, ולא משובצים כבר באותה משמרת בבית השני */
+function freeFor(I, ds, sh) {
+  return I.submitted.filter(function (g) {
+    if (isBlk(I, g.id, ds, sh)) return false;
+    return !HOUSES.some(function (h) { var o = I.occ[ds + '|' + sh + '|' + h.id]; return o && o.guideId === g.id; });
+  });
+}
+function warningsFor(all, guideId, date, shift) {
+  var has = function (d, s) { return all.some(function (r) { return r.guideId === guideId && r.date === d && r.shift === s; }); };
+  var w = [];
+  if (shift === 'M') { if (has(addDays(date, -1), 'N')) w.push('בוקר מיד אחרי לילה'); if (has(date, 'E')) w.push('גם צהריים באותו יום'); }
+  if (shift === 'E') { if (has(date, 'M')) w.push('גם בוקר באותו יום'); if (has(date, 'N')) w.push('צהריים ולילה ברצף'); }
+  if (shift === 'N') { if (has(date, 'E')) w.push('צהריים ולילה ברצף'); if (has(addDays(date, 1), 'M')) w.push('לילה ואחריו בוקר'); }
+  return w;
+}
+function gname(I, id) { var g = I.gById[id]; return g ? g.name + (g.status === 'removed' ? ' (הוסר)' : '') : '?'; }
+
+/* ── לשונית: לוח שיבוץ ── */
+function tabBoard(body) {
+  if (!A.months.length) return noMonths(body);
+  body.appendChild(el('div', { class: 'row noprint', style: 'margin-top:14px' }, monthPicker(function () { renderAdmin(); })));
+  var holder = el('div'); body.appendChild(holder);
+  loadBoard().then(function (b) { if (b) drawBoard(holder, b); });
+}
+function drawBoard(holder, b) {
+  clear(holder);
+  var I = idx(b), m = b.month, dates = monthDates(m.month);
+  var total = dates.length * 6, filled = Object.keys(I.occ).length;
+
+  var acts = el('div', { class: 'row noprint', style: 'margin:12px 0' }, statusBadge(m.status), el('span', { class: 'spacer' }));
+  acts.appendChild(el('button', { class: 'btn small', onclick: function () {
+    confirmBox('שיבוץ אוטומטי', 'המערכת תמלא את המשבצות הריקות מתוך המדריכים שהגישו ולא סימנו "לא לשבץ", בחלוקה הוגנת וללא רצפים של 16 שעות. מדריכים שלא הגישו לא ישובצו אוטומטית. שיבוצים קיימים לא ישתנו, ותוכלו לתקן ידנית אחר כך.', 'מלא עכשיו').then(function (y) {
+      if (y) boardAction('adminAutoFill', { month: m.month }, 'משבץ…').then(function (r) { if (r) { toast('שובצו ' + r.filled + ' משמרות. נשארו ריקות: ' + r.empty); renderAdmin(); } });
+    });
+  } }, '🪄 שיבוץ אוטומטי למשבצות הריקות'));
+  acts.appendChild(el('button', { class: 'btn small', onclick: function () { window.print(); } }, '🖨 הדפסה'));
+  if (m.status === 'open') acts.appendChild(el('button', { class: 'btn small', onclick: function () { setStatus(m.month, 'closed'); } }, '🔒 סגירת ההגשה'));
+  if (m.status !== 'published') acts.appendChild(el('button', { class: 'btn small ok', onclick: function () { publishFlow(m.month); } }, '✅ פרסום השיבוץ למדריכים'));
+  else acts.appendChild(el('button', { class: 'btn small wa', onclick: function () { messageQueue(m.month, 'published'); } }, '📲 שליחת השיבוץ בוואטסאפ'));
+  holder.appendChild(acts);
+
+  holder.appendChild(el('div', { class: 'stats noprint' },
+    el('div', { class: 'stat' }, el('b', { text: filled + ' / ' + total }), 'משבצות מאוישות'),
+    el('div', { class: 'stat' }, el('b', { text: String(total - filled) }), 'משבצות ריקות'),
+    el('div', { class: 'stat' }, el('b', { text: I.submitted.length + ' / ' + I.active.length }), 'מדריכים שהגישו'),
+    el('div', { class: 'stat' }, el('b', { text: String(I.missing.length) }), 'טרם הגישו')));
+  if (m.status === 'published') holder.appendChild(el('div', { class: 'notice ok noprint' }, 'השיבוץ פורסם. כל שינוי שתעשו עכשיו יופיע מיד אצל המדריך — מומלץ לשלוח לו הודעה על השינוי.'));
+  if (I.missing.length && m.status !== 'published') holder.appendChild(el('div', { class: 'notice warn noprint' }, 'טרם הגישו: ' + I.missing.map(function (g) { return g.name; }).join(', ') + '. ',
+    el('button', { class: 'btn small wa', onclick: function () { messageQueue(m.month, 'reminder'); } }, '📲 תזכורת')));
+
+  var chips = el('div', { class: 'glist noprint' });
+  I.active.slice().sort(function (a, c) { return (I.count[c.id] || 0) - (I.count[a.id] || 0); }).forEach(function (g) {
+    chips.appendChild(el('span', { class: 'gchip', title: 'משובץ / משמרות שבהן אפשר לשבץ' }, g.name + ': ', el('b', { text: String(I.count[g.id] || 0) }),
+      I.notes[g.id] ? ' / ' + availN(I, g.id) : ' (לא הגיש)'));
+  });
+  holder.appendChild(el('details', { class: 'noprint' }, el('summary', { text: 'כמה משמרות לכל מדריך (משובץ / אפשר לשבץ)' }), chips));
+  holder.appendChild(el('div', { class: 'legend noprint' },
+    el('span', {}, el('i', { style: 'background:#fff;border:2px solid #b9bfc4' }), 'בית לבן – משובץ'),
+    el('span', {}, el('i', { style: 'background:var(--G-bg);border:2px solid #9fd3b0' }), 'בית ירוק – משובץ'),
+    el('span', {}, el('i', { style: 'background:var(--warn-soft);border:2px solid #f0d58a' }), 'ריק – יש מדריכים פנויים'),
+    el('span', {}, el('i', { style: 'background:var(--bad-soft);border:2px solid #efb9b4' }), 'ריק – אין אף מדריך פנוי'),
+    el('span', { text: '⚠ = עומס/רצף   ⛔ = המדריך ביקש לא לשבץ' })));
+
+  holder.appendChild(el('div', { class: 'printtitle', text: 'שיבוץ משמרות – בית מאזן בטבע – ' + monthTitle(m.month) + ' (' + hMonthRange(m.month) + ')' }));
+  var thead = el('thead', {},
+    el('tr', {}, el('th', { rowspan: '2' }, 'תאריך'), SHIFTS.map(function (s) { return el('th', { colspan: '2', class: 's' + s.id + ' sep' }, s.icon + ' ' + s.name + ' ', el('span', { style: 'direction:ltr;display:inline-block;font-weight:400', text: s.hours })); })),
+    el('tr', {}, SHIFTS.map(function (s) { return HOUSES.map(function (h, i) { return el('th', { class: 'h' + h.id + (i === 0 ? ' sep' : ''), text: h.name }); }); })));
+  var tbody = el('tbody');
+  dates.forEach(function (ds) {
+    var hol = holiday(ds), w = dow(ds);
+    var tr = el('tr', { class: w === 6 ? 'sat' : '' }, el('td', { class: 'dt' }, el('b', { text: DAYS_S[w] + ' ' + gShort(ds) }), ' ', el('span', { class: 'h', text: hDate(ds) }),
+      hol ? el('div', {}, el('span', { class: 'badge hol', style: 'font-size:.72rem', text: hol })) : null));
+    SHIFTS.forEach(function (s) {
+      var free = null;
+      HOUSES.forEach(function (h, i) {
+        var r = I.occ[ds + '|' + s.id + '|' + h.id];
+        var btn;
+        if (r) {
+          var warn = warningsFor(I.all, r.guideId, ds, s.id);
+          var blk = isBlk(I, r.guideId, ds, s.id);
+          if (blk) warn.unshift('ביקש/ה לא לשבץ');
+          btn = el('button', { class: 'cell filled ' + h.id, title: warn.join(' · ') }, gname(I, r.guideId), blk ? el('span', { class: 'wf', style: 'color:var(--bad)' }, ' ⛔') : null,
+            warn.length > (blk ? 1 : 0) ? el('span', { class: 'wf' }, ' ⚠') : null);
+        } else {
+          if (!free) free = freeFor(I, ds, s.id);
+          btn = el('button', { class: 'cell empty ' + (free.length ? 'cands' : 'none'), 'aria-label': 'משבצת ריקה ' + gDate(ds) + ' ' + s.name + ' ' + h.name }, free.length ? 'פנויים: ' + free.length : 'אין פנויים');
+        }
+        btn.addEventListener('click', function () { slotPicker(ds, s.id, h.id); });
+        tr.appendChild(el('td', { class: i === 0 ? 'sep' : '' }, btn));
+      });
+    });
+    tbody.appendChild(tr);
+  });
+  holder.appendChild(el('div', { class: 'tablewrap' }, el('table', { class: 'board' }, thead, tbody)));
+}
+function slotPicker(ds, sh, house) {
+  var b = A.board, I = idx(b), m = b.month.month;
+  var occ = I.occ[ds + '|' + sh + '|' + house];
+  var body = el('div');
+  var close;
+  body.appendChild(el('p', { style: 'font-size:1.05rem;margin-top:0' }, el('b', { text: dayLabel(ds) }), ' · ' + hDate(ds) + ' · ' + shiftLine(sh) + ' · ', el('span', { class: 'badge ' + house, text: HOUSE[house].name })));
+  var assign = function (gid, other) {
+    var p = Promise.resolve(true);
+    if (other) p = run('adminUnassign', { month: m, date: ds, shift: sh, house: other }).then(function (x) { return !!x; });
+    p.then(function (okk) {
+      if (!okk) return;
+      boardAction('adminAssign', { month: m, date: ds, shift: sh, house: house, guideId: gid }, 'משבץ…').then(function (r) {
+        if (!r) return;
+        close(); renderAdmin();
+        if (r.warnings && r.warnings.length) alertBox('שובץ, אבל שימו לב: ' + r.warnings.join(' · '));
+        else toast('שובץ ✓');
+      });
+    });
+  };
+  if (occ) {
+    body.appendChild(el('div', { class: 'cand', style: 'background:' + (house === 'G' ? 'var(--G-bg)' : '#fff') },
+      el('div', { style: 'flex:1' }, el('div', { class: 'meta', text: 'משובץ כרגע:' }), el('div', { class: 'nm', text: gname(I, occ.guideId) }),
+        isBlk(I, occ.guideId, ds, sh) ? el('div', { style: 'color:var(--bad);font-size:.85rem', text: '⛔ ביקש/ה לא לשבץ למשמרת הזו' }) : null),
+      el('button', { class: 'btn small danger', onclick: function () {
+        boardAction('adminUnassign', { month: m, date: ds, shift: sh, house: house }, 'מסיר…').then(function (r) { if (r) { close(); renderAdmin(); toast('השיבוץ הוסר'); } });
+      } }, 'הסרת השיבוץ')));
+  }
+  var row = function (g, kind) {
+    var where = HOUSES.filter(function (h) { var o = I.occ[ds + '|' + sh + '|' + h.id]; return o && o.guideId === g.id; })[0];
+    var r = el('div', { class: 'cand', style: kind === 'blocked' ? 'background:#fff7f6' : '' });
+    r.appendChild(el('div', { style: 'flex:1;min-width:150px' }, el('div', { class: 'nm', text: g.name }),
+      el('div', { class: 'meta', text: 'משובץ החודש: ' + (I.count[g.id] || 0) + (I.notes[g.id] ? ' · אפשר לשבץ ב-' + availN(I, g.id) + ' משמרות' : ' · לא הגיש זמינות') })));
+    if (where && where.id === house) r.appendChild(el('span', { class: 'badge published', text: 'משובץ כאן ✓' }));
+    else if (where) {
+      r.appendChild(el('span', { class: 'badge ' + where.id, text: 'משובץ ב' + where.name }));
+      r.appendChild(el('button', { class: 'btn small', onclick: function () { assign(g.id, where.id); } }, 'העברה ל' + HOUSE[house].name));
+    } else if (kind === 'blocked') {
+      r.appendChild(el('button', { class: 'btn small danger', onclick: function () {
+        confirmBox('המדריך ביקש לא לשבץ', g.name + ' סימן/ה "לא לשבץ למשמרת" הזו. לשבץ בכל זאת?', 'כן, לשבץ', 'danger').then(function (y) { if (y) assign(g.id); });
+      } }, 'שיבוץ בכל זאת'));
+    } else r.appendChild(el('button', { class: 'btn small ' + (kind === 'free' ? 'ok' : ''), onclick: function () { assign(g.id); } }, 'שיבוץ ל' + HOUSE[house].name));
+    var w = warningsFor(I.all, g.id, ds, sh);
+    if (w.length && !where) r.appendChild(el('div', { class: 'w', text: '⚠ ' + w.join(' · ') }));
+    if (I.notes[g.id] && I.notes[g.id].note) r.appendChild(el('div', { class: 'nt', text: '✍️ ' + I.notes[g.id].note }));
+    return r;
+  };
+  var free = I.submitted.filter(function (g) { return !isBlk(I, g.id, ds, sh); })
+    .sort(function (a, c) { return (I.count[a.id] || 0) / Math.max(1, availN(I, a.id)) - (I.count[c.id] || 0) / Math.max(1, availN(I, c.id)); });
+  body.appendChild(el('h3', { style: 'margin-top:16px', text: '✅ פנויים למשמרת (' + free.length + ')' }));
+  if (!free.length) body.appendChild(el('p', { class: 'muted', text: 'אין מדריך שהגיש ולא סימן "לא לשבץ" למשמרת הזו.' }));
+  free.forEach(function (g) { body.appendChild(row(g, 'free')); });
+  if (I.missing.length) {
+    var det = el('details', { style: 'margin-top:12px' }, el('summary', { text: '❔ לא הגישו זמינות (' + I.missing.length + ')' }));
+    I.missing.forEach(function (g) { det.appendChild(row(g, 'missing')); });
+    body.appendChild(det);
+  }
+  var blockedG = I.submitted.filter(function (g) { return isBlk(I, g.id, ds, sh); });
+  if (blockedG.length) {
+    var det2 = el('details', { style: 'margin-top:12px' }, el('summary', { text: '⛔ ביקשו לא לשבץ (' + blockedG.length + ')' }));
+    blockedG.forEach(function (g) { det2.appendChild(row(g, 'blocked')); });
+    body.appendChild(det2);
+  }
+  close = modal('שיבוץ משמרת', body, [{ label: 'סגירה', cls: 'ghost' }], { noFocus: true });
+}
+function setStatus(month, status) {
+  return run('adminMonthStatus', { month: month, status: status }, 'מעדכן…').then(function (r) {
+    if (!r) return null;
+    updateMonth(r.month); A.board = null; renderAdmin(); return r;
+  });
+}
+function publishFlow(month) {
+  loadBoard().then(function (b) {
+    if (!b) return;
+    var I = idx(b), dates = monthDates(month), empty = dates.length * 6 - Object.keys(I.occ).length;
+    var msg = 'לאחר הפרסום כל מדריך יראה בקישור שלו את המשמרות שבהן שובץ ובאיזה בית.' +
+      (empty ? '\nשימו לב: ' + empty + ' משבצות עדיין ריקות.' : '') + '\nאפשר לבטל את הפרסום ולתקן בכל עת.';
+    confirmBox('פרסום השיבוץ ל' + monthTitle(month), msg, '✅ כן, לפרסם', 'ok').then(function (y) {
+      if (!y) return;
+      setStatus(month, 'published').then(function (r) {
+        if (!r) return;
+        modal('השיבוץ פורסם ✓', el('p', { style: 'font-size:1.1rem', text: 'שובצו ' + r.assigned + ' משמרות. עכשיו שלחו לכל מדריך הודעת וואטסאפ עם המשמרות שלו.' }),
+          [{ label: '📲 לשליחת ההודעות', cls: 'wa', fn: function () { setTimeout(function () { messageQueue(month, 'published'); }, 50); } }, { label: 'אחר כך', cls: 'ghost' }]);
+      });
+    });
+  });
+}
+
+/* ── לשונית: זמינות לפי מדריך ── */
+function tabRequests(body) {
+  if (!A.months.length) return noMonths(body);
+  body.appendChild(el('div', { class: 'row', style: 'margin-top:14px' }, monthPicker(function () { renderAdmin(); })));
+  var holder = el('div'); body.appendChild(holder);
+  loadBoard().then(function (b) {
+    if (!b) return;
+    var I = idx(b), m = b.month;
+    holder.appendChild(el('div', { class: 'notice info' }, 'כאן רואים לכל מדריך מתי ביקש ', el('b', { text: 'לא לשבץ' }), ' אותו, את ההערות שלו ואת השיבוצים שלו. השיבוץ עצמו נעשה בלשונית "לוח שיבוץ".'));
+    if (I.missing.length) holder.appendChild(el('div', { class: 'card', style: 'border:2px solid var(--warn)' }, el('h3', { text: '❔ טרם הגישו (' + I.missing.length + ')' }),
+      el('div', { class: 'glist' }, I.missing.map(function (g) { return el('span', { class: 'gchip', text: g.name }); })),
+      m.status !== 'published' ? el('button', { class: 'btn wa small', onclick: function () { messageQueue(m.month, 'reminder'); } }, '📲 שליחת תזכורת בוואטסאפ') : null));
+    var guides = b.guides.filter(function (g) { return I.notes[g.id] || I.count[g.id]; });
+    guides.sort(function (a, c) { return a.name.localeCompare(c.name, 'he'); });
+    if (!guides.length) holder.appendChild(el('div', { class: 'card' }, el('p', { text: 'אף מדריך עדיין לא הגיש לחודש הזה.' })));
+    guides.forEach(function (g) {
+      var card = el('div', { class: 'card' });
+      var n = I.notes[g.id];
+      card.appendChild(el('div', { class: 'row' }, el('h2', { text: g.name }), g.status !== 'active' ? el('span', { class: 'badge', text: 'הוסר' }) : null, el('span', { class: 'spacer' }),
+        el('span', { class: 'muted', text: n ? '⛔ לא לשבץ: ' + (I.blockN[g.id] || 0) + ' · אפשר לשבץ: ' + availN(I, g.id) + ' · משובץ: ' + (I.count[g.id] || 0) : 'לא הגיש · משובץ: ' + (I.count[g.id] || 0) })));
+      if (n) card.appendChild(el('div', { class: 'muted', style: 'font-size:.9rem', text: 'נשלח: ' + stamp(n.submittedAt) }));
+      if (n && n.note) card.appendChild(el('div', { class: 'notice warn', text: '✍️ ' + n.note }));
+      var blks = b.blocks.filter(function (x) { return x.guideId === g.id; });
+      if (n) {
+        if (!blks.length) card.appendChild(el('div', { class: 'notice ok', text: 'אפשר לשבץ בכל המשמרות בחודש.' }));
+        else {
+          var byDay = {};
+          blks.forEach(function (x) { (byDay[x.date] = byDay[x.date] || []).push(x.shift); });
+          var lines = el('div', { class: 'glist' });
+          Object.keys(byDay).sort().forEach(function (ds) {
+            var sh = byDay[ds].sort(function (a, c) { return 'MEN'.indexOf(a) - 'MEN'.indexOf(c); });
+            lines.appendChild(el('span', { class: 'gchip', style: 'border-color:#efb9b4;background:#fff7f6' }, el('b', { style: 'color:var(--bad)', text: DAYS_S[dow(ds)] + ' ' + gShort(ds) }), ' ' +
+              (sh.length === 3 ? 'כל היום' : sh.map(function (s) { return SHIFT[s].name; }).join(' + '))));
+          });
+          card.appendChild(el('h3', { style: 'margin:10px 0 0;color:var(--bad)', text: '⛔ ביקש לא לשבץ (' + blks.length + '):' }));
+          card.appendChild(lines);
+        }
+      }
+      var mine = (I.mine[g.id] || []).slice().sort(function (a, c) { return (a.date + 'MEN'.indexOf(a.shift)) < (c.date + 'MEN'.indexOf(c.shift)) ? -1 : 1; });
+      if (mine.length) {
+        var det = el('details', {}, el('summary', { text: 'השיבוצים שלו (' + mine.length + ')' }));
+        mine.forEach(function (r) {
+          det.appendChild(el('div', { class: 'reqrow' }, el('div', { class: 'when' }, el('b', { text: DAYS_S[dow(r.date)] + ' ' + gShort(r.date) }), ' ', el('span', { class: 'muted', text: hDate(r.date) }), ' · ' + shiftLine(r.shift),
+            isBlk(I, g.id, r.date, r.shift) ? el('span', { style: 'color:var(--bad)', text: ' ⛔ ביקש לא לשבץ' }) : null),
+            el('span', { class: 'badge ' + r.house, text: HOUSE[r.house].name }),
+            el('button', { class: 'btn small ghost', onclick: function () {
+              boardAction('adminUnassign', { month: m.month, date: r.date, shift: r.shift, house: r.house }, 'מעדכן…').then(function (x) { if (x) renderAdmin(); });
+            } }, 'ביטול השיבוץ')));
+        });
+        card.appendChild(det);
+      }
+      holder.appendChild(card);
+    });
+  });
+}
+
+/* ── לשונית: מדריכים ── */
+function loadGuides(force) {
+  if (A.guides && !force) return Promise.resolve(A.guides);
+  return run('adminGuides', {}, 'טוען מדריכים…').then(function (d) {
+    if (d) { A.guides = d.guides; A.fields = d.fields; A.pending = d.guides.filter(function (g) { return g.status === 'pending'; }).length; }
+    return A.guides;
+  });
+}
+function inviteText(g) {
+  return 'שלום ' + g.firstName + ' 👋\nזה הקישור האישי שלך למערכת המשמרות של בית מאזן בטבע:\n' + guideLink(g) +
+    '\n\nבקישור הזה בוחרים משמרות ורואים את השיבוצים.\nמומלץ לשמור את ההודעה הזו. 🌿';
+}
+function guideAction(g, action, text) {
+  return run('adminGuideAction', { id: g.id, action: action }, text || 'מעדכן…').then(function (r) {
+    if (!r) return null; A.board = null; return loadGuides(true).then(function () { return r; });
+  });
+}
+function tabGuides(body) {
+  loadGuides().then(function (list) {
+    if (!list) return;
+    clear(body);
+    body.appendChild(el('div', { class: 'card' }, el('h3', { text: '🔗 קישור הרשמה למדריכים חדשים' }),
+      el('p', { class: 'muted', style: 'margin-top:0', text: 'שלחו את הקישור למדריך חדש (או לקבוצה). אחרי שימלא את הטופס הוא יופיע כאן לאישור.' }),
+      el('div', { class: 'linkbox' }, el('span', { style: 'flex:1', text: regLink() })),
+      el('div', { class: 'row', style: 'margin-top:10px' },
+        el('button', { class: 'btn small', onclick: function () { copyText(regLink()); } }, '📋 העתקה'),
+        el('button', { class: 'btn small wa', onclick: function () { openWa('', 'שלום 👋\nלהרשמה למערכת המשמרות של בית מאזן בטבע נא למלא את הטופס בקישור:\n' + regLink()); } }, '📲 שליחה בוואטסאפ'),
+        el('a', { class: 'btn small ghost', href: regLink(), target: '_blank' }, '👁 צפייה בטופס'))));
+
+    var pending = list.filter(function (g) { return g.status === 'pending'; });
+    var active = list.filter(function (g) { return g.status === 'active'; });
+    var removed = list.filter(function (g) { return g.status === 'removed'; });
+
+    if (pending.length) {
+      var pc = el('div', { class: 'card', style: 'border:2px solid var(--warn)' }, el('h2', { text: '🆕 ממתינים לאישור (' + pending.length + ')' }));
+      pending.forEach(function (g) {
+        pc.appendChild(el('div', { style: 'border-top:1px solid var(--line);padding:12px 0' },
+          el('div', { class: 'row' }, el('h3', { style: 'margin:0', text: g.name }), el('span', { class: 'muted', text: 'נרשם ' + stamp(g.createdAt) })),
+          detailsList(g),
+          el('div', { class: 'row', style: 'margin-top:10px' },
+            el('button', { class: 'btn ok', onclick: function () {
+              guideAction(g, 'approve', 'מאשר…').then(function (r) {
+                if (!r) return; renderAdmin();
+                modal(r.name + ' אושר/ה ✓', el('p', { style: 'font-size:1.05rem', text: 'עכשיו שלחו לו/ה את הקישור האישי בוואטסאפ.' }),
+                  [{ label: '📲 שליחת הקישור בוואטסאפ', cls: 'wa', fn: function () { openWa(r.phone, inviteText(r)); } }, { label: 'אחר כך', cls: 'ghost' }]);
+              });
+            } }, '✓ אישור'),
+            el('button', { class: 'btn danger', onclick: function () {
+              confirmBox('לדחות את ההרשמה?', g.name + ' יועבר/תועבר לרשימת המוסרים. אפשר להחזיר בהמשך.', 'דחייה', 'danger').then(function (y) { if (y) guideAction(g, 'remove').then(function (r) { if (r) renderAdmin(); }); });
+            } }, '✗ דחייה'))));
+      });
+      body.appendChild(pc);
+    }
+
+    var search = el('input', { class: 'inp', type: 'search', placeholder: '🔎 חיפוש לפי שם או טלפון', style: 'flex:1;min-width:200px' });
+    var listBox = el('div');
+    var draw = function () {
+      clear(listBox);
+      var q = search.value.trim();
+      var shown = active.filter(function (g) { return !q || g.name.indexOf(q) >= 0 || String(g.phone).indexOf(q.replace(/\D/g, '') || '§') >= 0; });
+      shown.sort(function (a, c) { return a.name.localeCompare(c.name, 'he'); });
+      if (!shown.length) listBox.appendChild(el('p', { class: 'muted', text: active.length ? 'לא נמצאו מדריכים.' : 'עדיין אין מדריכים פעילים.' }));
+      shown.forEach(function (g) {
+        listBox.appendChild(el('div', { class: 'glistrow' },
+          el('div', { class: 'nm', text: g.name }), el('div', { class: 'muted', style: 'direction:ltr;min-width:110px;text-align:right', text: g.phone }), el('span', { class: 'spacer' }),
+          el('button', { class: 'btn small wa', onclick: function () { openWa(g.phone, inviteText(g)); } }, '📲 שליחת קישור'),
+          el('button', { class: 'btn small', onclick: function () { copyText(guideLink(g)); } }, '📋 העתקת קישור'),
+          el('button', { class: 'btn small', onclick: function () { guideDialog(g); } }, '✏️ פרטים'),
+          el('button', { class: 'btn small danger', onclick: function () {
+            confirmBox('להסיר את ' + g.name + '?', 'הקישור האישי יפסיק לעבוד והמדריך לא יופיע לשיבוץ. השיבוצים הקיימים נשמרים. אפשר להחזיר בכל עת.', 'הסרה', 'danger').then(function (y) {
+              if (y) guideAction(g, 'remove', 'מסיר…').then(function (r) { if (r) { renderAdmin(); toast('המדריך הוסר'); } });
+            });
+          } }, 'הסרה')));
+      });
+    };
+    search.addEventListener('input', draw);
+    body.appendChild(el('div', { class: 'card' }, el('div', { class: 'row' }, el('h2', { text: '👥 מדריכים פעילים (' + active.length + ')' }), el('span', { class: 'spacer' }),
+      el('button', { class: 'btn primary small', onclick: function () { guideDialog(null); } }, '➕ הוספת מדריך')), el('div', { class: 'row', style: 'margin:10px 0' }, search), listBox));
+    draw();
+
+    if (removed.length) {
+      var rc = el('details', { class: 'card' }, el('summary', { text: 'מדריכים שהוסרו (' + removed.length + ')' }));
+      removed.forEach(function (g) {
+        rc.appendChild(el('div', { class: 'glistrow' }, el('div', { class: 'nm', text: g.name }), el('div', { class: 'muted', style: 'direction:ltr', text: g.phone }), el('span', { class: 'spacer' }),
+          el('button', { class: 'btn small', onclick: function () { guideDialog(g); } }, 'פרטים'),
+          el('button', { class: 'btn small ok', onclick: function () { guideAction(g, 'restore').then(function (r) { if (r) { renderAdmin(); toast('הוחזר לפעילות'); } }); } }, 'החזרה לפעילות'),
+          el('button', { class: 'btn small danger', onclick: function () {
+            confirmBox('מחיקה לצמיתות', 'כל הפרטים, הבקשות והשיבוצים של ' + g.name + ' יימחקו לצמיתות ולא ניתן יהיה לשחזר אותם.', 'מחיקה לצמיתות', 'danger').then(function (y) {
+              if (y) guideAction(g, 'delete', 'מוחק…').then(function (r) { if (r) { renderAdmin(); toast('נמחק'); } });
+            });
+          } }, 'מחיקה לצמיתות')));
+      });
+      body.appendChild(rc);
+    }
+  });
+}
+function detailsList(g) {
+  var dl = el('dl', { class: 'kv' });
+  A.fields.forEach(function (f) {
+    var v = g.data[f.key]; if (!v) return;
+    if (f.type === 'date' && /^\d{4}-\d{2}-\d{2}$/.test(v)) {
+      var age = '';
+      if (f.key === 'birthDate') { var t = A.today || todayStr(); var y = +t.slice(0, 4) - +v.slice(0, 4); if (t.slice(5) < v.slice(5)) y--; age = ' (גיל ' + y + ')'; }
+      v = v.slice(8, 10) + '/' + v.slice(5, 7) + '/' + v.slice(0, 4) + age;
+    }
+    dl.appendChild(el('dt', { text: f.label })); dl.appendChild(el('dd', { text: v, dir: f.type === 'tel' || f.type === 'email' ? 'ltr' : null, style: f.type === 'tel' ? 'text-align:right' : null }));
+  });
+  Object.keys(g.extra || {}).forEach(function (k) { dl.appendChild(el('dt', { text: k + ' (שדה שהוסר)' })); dl.appendChild(el('dd', { text: g.extra[k] })); });
+  return dl;
+}
+function guideDialog(g) {
+  var answers = g ? JSON.parse(JSON.stringify(g.data)) : {};
+  var fields = A.fields.map(function (f) { return Object.assign({}, f, { required: f.locked }); });
+  var form = el('div');
+  fields.forEach(function (f) { form.appendChild(fieldInput(f, answers[f.key], function (k, v) { answers[k] = v; })); });
+  var body = el('div', {}, g ? null : el('p', { class: 'muted', text: 'רק שם וטלפון הם חובה כשמוסיפים ידנית. המדריך יאושר מיד.' }), form);
+  if (g && Object.keys(g.extra || {}).length) body.appendChild(el('details', {}, el('summary', { text: 'נתונים משדות שהוסרו מהטופס' }), detailsList({ data: {}, extra: g.extra })));
+  if (g && g.status === 'active') body.appendChild(el('div', { class: 'card', style: 'background:#f7f7f2' }, el('h3', { text: 'קישור אישי' }), el('div', { class: 'linkbox', text: guideLink(g) }),
+    el('div', { class: 'row', style: 'margin-top:8px' }, el('button', { class: 'btn small', onclick: function () {
+      confirmBox('יצירת קישור חדש', 'הקישור הישן יפסיק לעבוד (שימושי אם הקישור הגיע לאדם אחר). אחר כך שלחו למדריך את הקישור החדש.', 'יצירת קישור חדש').then(function (y) {
+        if (y) guideAction(g, 'newlink').then(function (r) { if (r) { close(); renderAdmin(); modal('נוצר קישור חדש', el('p', { text: 'שלחו ל' + r.name + ' את הקישור החדש:' }), [{ label: '📲 שליחה בוואטסאפ', cls: 'wa', fn: function () { openWa(r.phone, inviteText(r)); } }, { label: 'סגירה', cls: 'ghost' }]); } });
+      });
+    } }, '🔄 יצירת קישור חדש (ביטול הישן)'))));
+  var close = modal(g ? 'פרטי מדריך: ' + g.name : 'הוספת מדריך', body, [
+    { label: '💾 שמירה', cls: 'primary', keep: true, fn: function () {
+      form.querySelectorAll('input,textarea,select').forEach(function (i) { var k = i.id.replace(/^f_/, ''); if (k) answers[k] = i.value; });
+      if (!markMissing(form, fields, answers)) return false;
+      run(g ? 'adminUpdateGuide' : 'adminAddGuide', { id: g && g.id, answers: answers }, 'שומר…').then(function (r) {
+        if (!r) return;
+        A.board = null; close();
+        loadGuides(true).then(function () {
+          renderAdmin(); toast('נשמר ✓');
+          if (!g) modal(r.name + ' נוסף/ה ✓', el('p', { text: 'לשלוח לו/ה עכשיו את הקישור האישי בוואטסאפ?' }), [{ label: '📲 שליחה בוואטסאפ', cls: 'wa', fn: function () { openWa(r.phone, inviteText(r)); } }, { label: 'אחר כך', cls: 'ghost' }]);
+        });
+      });
+      return false;
+    } },
+    { label: 'ביטול', cls: 'ghost' }], { noFocus: true });
+}
+
+/* ── לשונית: עריכת טופס ההרשמה ── */
+var TYPE_HE = { text: 'טקסט קצר', textarea: 'טקסט ארוך', tel: 'טלפון', email: 'דוא״ל', date: 'תאריך', number: 'מספר', select: 'בחירה מרשימה', yesno: 'כן / לא', idnum: 'תעודת זהות' };
+function tabForm(body) {
+  var list = A.fields.map(function (f) { return Object.assign({}, f); });
+  var box = el('div');
+  var draw = function () {
+    clear(box);
+    list.forEach(function (f, i) {
+      var label = el('input', { type: 'text', value: f.label, 'aria-label': 'כותרת השאלה', oninput: function (e) { f.label = e.target.value; } });
+      var type = el('select', { 'aria-label': 'סוג', disabled: f.locked, onchange: function (e) { f.type = e.target.value; draw(); } }, Object.keys(TYPE_HE).map(function (t) { return el('option', { value: t }, TYPE_HE[t]); }));
+      type.value = f.type;
+      var req = el('label', { class: 'row', style: 'gap:4px;white-space:nowrap' }, el('input', { type: 'checkbox', checked: f.required, disabled: f.locked, onchange: function (e) { f.required = e.target.checked; } }), 'חובה');
+      var del = f.locked ? el('span', { title: 'שדה בסיסי – לא ניתן להסרה', text: '🔒' }) : el('button', { class: 'btn small danger', 'aria-label': 'הסרת השאלה', onclick: function () {
+        confirmBox('להסיר את השאלה?', '"' + f.label + '" תוסר מהטופס. תשובות שכבר נמסרו יישמרו אצל המדריכים.', 'הסרה', 'danger').then(function (y) { if (y) { list.splice(i, 1); draw(); } });
+      } }, '🗑');
+      var mv = el('div', { class: 'mv' },
+        el('button', { 'aria-label': 'למעלה', disabled: i === 0, onclick: function () { var t = list[i - 1]; list[i - 1] = f; list[i] = t; draw(); } }, '▲'),
+        el('button', { 'aria-label': 'למטה', disabled: i === list.length - 1, onclick: function () { var t = list[i + 1]; list[i + 1] = f; list[i] = t; draw(); } }, '▼'));
+      var row = el('div', { class: 'fieldedit' }, mv, label, type, req, del);
+      if (f.type === 'select') row.appendChild(el('div', { class: 'opts' }, el('input', { type: 'text', value: (f.options || '').split('|').join(', '), placeholder: 'אפשרויות מופרדות בפסיק, לדוגמה: בוקר, ערב, לילה',
+        oninput: function (e) { f.options = e.target.value.split(/[,،|]/).map(function (s) { return s.trim(); }).filter(Boolean).join('|'); } })));
+      box.appendChild(row);
+    });
+  };
+  draw();
+  body.appendChild(el('div', { class: 'card' }, el('h2', { text: '📝 שאלות בטופס ההרשמה' }),
+    el('p', { class: 'muted', text: 'כאן מוסיפים, מסירים, משנים ומסדרים את השאלות שהמדריכים ממלאים בהרשמה. שם, משפחה וטלפון הם שדות בסיס ואי אפשר להסיר אותם.' }),
+    box,
+    el('div', { class: 'row', style: 'margin-top:12px' },
+      el('button', { class: 'btn', onclick: function () { list.push({ key: '', label: '', type: 'text', required: false, options: '', locked: false }); draw(); var ins = box.querySelectorAll('input[type=text]'); var last = box.lastChild.querySelector('input[type=text]'); if (last) last.focus(); } }, '➕ הוספת שאלה'),
+      el('span', { class: 'spacer' }),
+      el('a', { class: 'btn ghost', href: regLink(), target: '_blank' }, '👁 צפייה בטופס'),
+      el('button', { class: 'btn primary', onclick: function () {
+        run('adminSaveFields', { fields: list }, 'שומר…').then(function (r) { if (r) { A.fields = r; toast('הטופס נשמר ✓'); renderAdmin(); } });
+      } }, '💾 שמירת הטופס'))));
+}
+
+/* ── לשונית: חודשים והודעות ── */
+function tabMonths(body) {
+  var cur = A.today.slice(0, 7), opts = [];
+  for (var i = 0; i < 8; i++) {
+    var d = new Date(Date.UTC(+cur.slice(0, 4), +cur.slice(5, 7) - 1 + i, 1));
+    var m = d.getUTCFullYear() + '-' + pad2(d.getUTCMonth() + 1);
+    if (!monthObj(m)) opts.push(m);
+  }
+  var sel = el('select', { class: 'inp' }, opts.map(function (m) { return el('option', { value: m }, monthTitle(m) + ' · ' + hMonthRange(m)); }));
+  var defDeadline = opts[0] ? addDays(opts[0] + '-01', -7) : '';
+  var dl = el('input', { class: 'inp', type: 'date', value: defDeadline < A.today ? '' : defDeadline });
+  sel.addEventListener('change', function () { var d2 = addDays(sel.value + '-01', -7); dl.value = d2 < A.today ? '' : d2; });
+  body.appendChild(el('div', { class: 'card' }, el('h2', { text: '➕ פתיחת חודש להגשת משמרות' }),
+    opts.length ? el('div', { class: 'row' }, el('label', {}, 'חודש: ', sel), el('label', {}, 'תאריך אחרון להגשה (לא חובה): ', dl),
+      el('button', { class: 'btn primary', onclick: function () {
+        run('adminSaveMonth', { month: sel.value, deadline: dl.value }, 'פותח חודש…').then(function (r) {
+          if (!r) return;
+          A.months.push(r); A.months.sort(function (a, c) { return a.month < c.month ? -1 : 1; }); A.month = r.month; ls('admin_month', r.month); A.board = null;
+          renderAdmin();
+          modal(monthTitle(r.month) + ' נפתח להגשה ✓', el('p', { style: 'font-size:1.05rem', text: 'עכשיו שלחו לכל המדריכים הודעה בוואטסאפ עם הקישור האישי שלהם.' }),
+            [{ label: '📲 לשליחת ההודעות', cls: 'wa', fn: function () { setTimeout(function () { messageQueue(r.month, 'open'); }, 50); } }, { label: 'אחר כך', cls: 'ghost' }]);
+        });
+      } }, 'פתיחה')) : el('p', { class: 'muted', text: 'כל החודשים הקרובים כבר נפתחו.' })));
+
+  var list = el('div', { class: 'card' }, el('h2', { text: '📆 חודשים' }));
+  if (!A.months.length) list.appendChild(el('p', { class: 'muted', text: 'עדיין לא נפתחו חודשים.' }));
+  A.months.slice().reverse().forEach(function (mo) {
+    var dlEdit = el('input', { class: 'inp', type: 'date', value: mo.deadline || '', 'aria-label': 'תאריך אחרון להגשה' });
+    var row = el('div', { style: 'border-top:1px solid var(--line);padding:14px 0' },
+      el('div', { class: 'row' }, el('h3', { style: 'margin:0', text: monthTitle(mo.month) }), el('span', { class: 'muted', text: hMonthRange(mo.month) }), statusBadge(mo.status)),
+      el('div', { class: 'row', style: 'margin-top:8px' }, el('label', { class: 'row', style: 'gap:6px' }, 'הגשה עד:', dlEdit),
+        el('button', { class: 'btn small', onclick: function () { run('adminSaveMonth', { month: mo.month, deadline: dlEdit.value }, 'שומר…').then(function (r) { if (r) { updateMonth(r); toast('נשמר ✓'); } }); } }, 'שמירה')),
+      el('div', { class: 'row', style: 'margin-top:8px' },
+        mo.status === 'open' ? el('button', { class: 'btn small', onclick: function () { setStatus(mo.month, 'closed'); } }, '🔒 סגירת ההגשה') : null,
+        mo.status === 'closed' ? el('button', { class: 'btn small', onclick: function () { setStatus(mo.month, 'open'); } }, '🔓 פתיחה מחדש להגשה') : null,
+        mo.status !== 'published' ? el('button', { class: 'btn small ok', onclick: function () { A.month = mo.month; A.board = null; publishFlow(mo.month); } }, '✅ פרסום השיבוץ') : null,
+        mo.status === 'published' ? el('button', { class: 'btn small', onclick: function () {
+          confirmBox('ביטול הפרסום', 'המדריכים לא יראו את השיבוץ עד שתפרסמו שוב.', 'ביטול הפרסום').then(function (y) { if (y) setStatus(mo.month, 'closed'); });
+        } }, '↩️ ביטול הפרסום לתיקונים') : null,
+        el('span', { class: 'spacer' }),
+        el('button', { class: 'btn small wa', onclick: function () { messageQueue(mo.month, 'open'); } }, '📣 הודעת פתיחה'),
+        el('button', { class: 'btn small wa', onclick: function () { messageQueue(mo.month, 'reminder'); } }, '⏰ תזכורת למי שלא הגיש'),
+        mo.status === 'published' ? el('button', { class: 'btn small wa', onclick: function () { messageQueue(mo.month, 'published'); } }, '✅ שליחת השיבוץ האישי') : null,
+        el('button', { class: 'btn small danger', onclick: function () {
+          confirmBox('מחיקת ' + monthTitle(mo.month), 'כל הבקשות, ההערות והשיבוצים של החודש יימחקו לצמיתות ולא ניתן יהיה לשחזר אותם.', 'מחיקה לצמיתות', 'danger').then(function (y) {
+            if (!y) return;
+            run('adminDeleteMonth', { month: mo.month }, 'מוחק…').then(function (r) {
+              if (!r) return;
+              A.months = A.months.filter(function (x) { return x.month !== mo.month; }); A.board = null; A.month = pickDefaultMonth(); renderAdmin(); toast('החודש נמחק');
+            });
+          });
+        } }, '🗑')));
+    list.appendChild(row);
+  });
+  body.appendChild(list);
+  body.appendChild(el('div', { class: 'card' }, el('h3', { text: 'איך זה עובד?' }), el('ol', {},
+    el('li', { text: 'פותחים חודש ושולחים לכל המדריכים הודעת פתיחה בוואטסאפ (כל מדריך מקבל את הקישור האישי שלו).' }),
+    el('li', { text: 'המדריכים מסמנים מתי אי אפשר לשבץ אותם ("לא לשבץ למשמרת") ושולחים. אפשר לשלוח תזכורת למי שלא הגיש.' }),
+    el('li', { text: 'סוגרים את ההגשה ומשבצים בלשונית "לוח שיבוץ" — כל משמרת בנפרד, לבית הלבן או לבית הירוק, מתוך המדריכים הפנויים.' }),
+    el('li', { text: 'מפרסמים, ושולחים לכל מדריך הודעה עם המשמרות שלו. המדריך רואה רק את השיבוצים שלו.' }))));
+}
+
+/* ── תור הודעות וואטסאפ ── */
+function buildMessage(type, g, month, b, I) {
+  var link = guideLink(g), mt = monthTitle(month), mo = b.month;
+  if (type === 'open') return 'שלום ' + g.firstName + ' 👋\nנפתחה הגשת המשמרות ל' + mt + ' (' + hMonthRange(month) + ').\nנא ללחוץ על הקישור, לסמן את המשמרות שבהן *אי אפשר* לשבץ אותך (⛔ לא לשבץ למשמרת) וללחוץ "שליחה למנהל".\nגם אם אפשר לשבץ אותך בכל המשמרות — נא ללחוץ "שליחה למנהל":\n' + link +
+    (mo.deadline ? '\n\n⏰ נא לשלוח עד ' + dayLabel(mo.deadline) + '.' : '') + '\nתודה! 🌿';
+  if (type === 'reminder') return 'שלום ' + g.firstName + ' 🙂\nתזכורת: עוד לא התקבל ממך עדכון למשמרות ' + mt + '.\nזה לוקח דקה — לוחצים על הקישור, מסמנים מתי *אי אפשר* לשבץ אותך ושולחים:\n' + link +
+    (mo.deadline ? '\n\n⏰ עד ' + dayLabel(mo.deadline) + '.' : '') + '\nתודה! 🌿';
+  var mine = b.assignments.filter(function (r) { return r.guideId === g.id; })
+    .sort(function (a, c) { return (a.date + 'MEN'.indexOf(a.shift)) < (c.date + 'MEN'.indexOf(c.shift)) ? -1 : 1; });
+  if (!mine.length) return 'שלום ' + g.firstName + ' 👋\nהשיבוץ ל' + mt + ' פורסם.\nהחודש לא נקבעו לך משמרות. לשאלות אפשר לפנות אליי.\nלצפייה:\n' + link;
+  return 'שלום ' + g.firstName + ' 👋\nהשיבוץ ל' + mt + ' פורסם. המשמרות שלך (' + mine.length + '):\n\n' +
+    mine.map(function (r) { return '• יום ' + DAYS_S[dow(r.date)] + ' ' + gShort(r.date) + ' (' + hDate(r.date) + ') – ' + SHIFT[r.shift].name + ' ' + SHIFT[r.shift].hours + ' – ' + HOUSE[r.house].name; }).join('\n') +
+    '\n\nאפשר לראות את השיבוץ בכל רגע בקישור האישי:\n' + link + '\nתודה! 🌿';
+}
+function messageQueue(month, type) {
+  Promise.all([loadGuides(true), run('adminBoard', { month: month }, 'מכין הודעות…')]).then(function (res) {
+    var list = res[0], b = res[1];
+    if (!list || !b) return;
+    if (b.month.month === A.month) A.board = b;
+    var I = idx(b);
+    var targets = list.filter(function (g) { return g.status === 'active'; });
+    if (type === 'reminder') targets = targets.filter(function (g) { return !I.notes[g.id]; });
+    if (type === 'published') targets = targets.filter(function (g) { return I.count[g.id] || I.notes[g.id]; });
+    targets.sort(function (a, c) { return a.name.localeCompare(c.name, 'he'); });
+    var key = 'sent_' + month + '_' + type + '_' + (b.month.publishedAt || b.month.openedAt || '');
+    var sent = ls(key) || {};
+    var titles = { open: '📣 הודעת פתיחת הגשה', reminder: '⏰ תזכורת למי שלא הגיש', published: '✅ שליחת השיבוץ האישי' };
+    var body = el('div');
+    body.appendChild(el('p', { class: 'muted', style: 'margin-top:0' }, monthTitle(month) + ' · ' + targets.length + ' מדריכים. לוחצים על "שליחה" — נפתח וואטסאפ עם ההודעה מוכנה — ושם לוחצים על חץ השליחה. חוזרים לכאן לבא בתור.'));
+    if (!targets.length) body.appendChild(el('div', { class: 'notice ok', text: type === 'reminder' ? 'כל המדריכים כבר הגישו 👍' : 'אין למי לשלוח.' }));
+    targets.forEach(function (g) {
+      var txt = buildMessage(type, g, month, b, I);
+      var st = el('span', { class: 'badge ' + (sent[g.id] ? 'published' : ''), text: sent[g.id] ? '✓ נשלח' : 'טרם נשלח' });
+      var row = el('div', { class: 'cand' },
+        el('div', { style: 'flex:1;min-width:140px' }, el('div', { class: 'nm', text: g.name }), el('div', { class: 'meta', style: 'direction:ltr;text-align:right', text: g.phone })), st,
+        el('button', { class: 'btn small wa', onclick: function () { openWa(g.phone, txt); sent[g.id] = 1; ls(key, sent); st.textContent = '✓ נשלח'; st.className = 'badge published'; } }, '📲 שליחה'),
+        el('details', { style: 'width:100%' }, el('summary', { class: 'muted', text: 'צפייה בהודעה' }), el('pre', { style: 'white-space:pre-wrap;font-family:inherit;background:#f6f7f1;border-radius:8px;padding:8px;margin:4px 0', text: txt })));
+      body.appendChild(row);
+    });
+    modal(titles[type], body, [{ label: 'סגירה', cls: 'ghost' }], { noFocus: true });
+  });
+}
+
+/* ═════════════ מסכים נוספים וניתוב ═════════════ */
+function simple(icon, title, text, extra) {
+  applyFont();
+  clear($app).appendChild(el('div', {}, topbar(), el('div', { class: 'wrap' }, el('div', { class: 'card success' },
+    el('div', { class: 'big-ic', text: icon }), el('h1', { text: title }), el('p', { style: 'font-size:1.15rem', text: text }), extra))));
+}
+function start() {
+  if (BOOT.mode === 'admin') adminStart();
+  else if (BOOT.mode === 'guide') guideStart();
+  else if (BOOT.mode === 'register') registerStart();
+  else if (BOOT.mode === 'denied') simple('🔒', 'אין גישה', 'קישור הניהול אינו תקין.');
+  else simple('🌿', 'מערכת המשמרות של בית מאזן בטבע', 'כדי להיכנס יש להשתמש בקישור האישי שקיבלתם בוואטסאפ.',
+    el('a', { class: 'btn big primary', href: regLink() }, 'מדריך חדש? להרשמה'));
+}
+window.__app = { holiday: holiday, hDate: hDate, gem: gem, hMonthRange: hMonthRange };
+start();
+})();
+}
+if (window.BOOT) __main(); else window.__loadBoot(__main);
+</script>
+</body>
+</html>
