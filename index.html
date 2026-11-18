@@ -828,10 +828,16 @@ function drawBoard(holder, b) {
 
   var acts = el('div', { class: 'row noprint', style: 'margin:12px 0' }, statusBadge(m.status), el('span', { class: 'spacer' }));
   acts.appendChild(el('button', { class: 'btn small', onclick: function () {
-    confirmBox('שיבוץ אוטומטי', 'המערכת תמלא את המשבצות הריקות מתוך המדריכים שהגישו ולא סימנו "לא לשבץ", בחלוקה הוגנת וללא רצפים של 16 שעות. מדריכים שלא הגישו לא ישובצו אוטומטית. שיבוצים קיימים לא ישתנו, ותוכלו לתקן ידנית אחר כך.', 'מלא עכשיו').then(function (y) {
-      if (y) boardAction('adminAutoFill', { month: m.month }, 'משבץ…').then(function (r) { if (r) { toast('שובצו ' + r.filled + ' משמרות. נשארו ריקות: ' + r.empty); renderAdmin(); } });
+    confirmBox('שיבוץ אוטומטי', 'המערכת תמלא את המשבצות הריקות מתוך המדריכים שהגישו ולא סימנו "לא לשבץ", בחלוקה הוגנת וללא רצפים של 16 שעות. היא לומדת מהשיבוצים שאישרתם בעבר (חודשים שפורסמו ושיבוצים ידניים) ומשבצת כל מדריך בדומה — באותן משמרות, ימים ובית. מדריכים שלא הגישו לא ישובצו אוטומטית. שיבוצים קיימים לא ישתנו, ואפשר לבטל את השיבוץ האוטומטי בלחיצה.', 'מלא עכשיו').then(function (y) {
+      if (y) boardAction('adminAutoFill', { month: m.month }, 'משבץ…').then(function (r) { if (r) { toast('שובצו ' + r.filled + ' משמרות. נשארו ריקות: ' + r.empty + (r.learned ? ' · לפי הרגלי ' + r.learned + ' מדריכים' : '')); renderAdmin(); } });
     });
   } }, '🪄 שיבוץ אוטומטי למשבצות הריקות'));
+  var autoN = b.assignments.filter(function (r) { return r.source === 'auto'; }).length;
+  if (autoN) acts.appendChild(el('button', { class: 'btn small', style: 'border-color:var(--bad);color:var(--bad)', onclick: function () {
+    confirmBox('ביטול השיבוץ האוטומטי', 'יוסרו ' + autoN + ' משמרות ששובצו אוטומטית. שיבוצים שעשיתם או אישרתם ידנית יישארו במקומם.', 'כן, לבטל').then(function (y) {
+      if (y) boardAction('adminUndoAutoFill', { month: m.month }, 'מבטל…').then(function (r) { if (r) { toast('בוטלו ' + r.removed + ' שיבוצים אוטומטיים'); renderAdmin(); } });
+    });
+  } }, '↩ ביטול השיבוץ האוטומטי (' + autoN + ')'));
   acts.appendChild(el('button', { class: 'btn small', onclick: function () { window.print(); } }, '🖨 הדפסה'));
   if (m.status === 'open') acts.appendChild(el('button', { class: 'btn small', onclick: function () { setStatus(m.month, 'closed'); } }, '🔒 סגירת ההגשה'));
   if (m.status !== 'published') acts.appendChild(el('button', { class: 'btn small ok', onclick: function () { publishFlow(m.month); } }, '✅ פרסום השיבוץ למדריכים'));
@@ -1029,6 +1035,11 @@ function tabRequests(body) {
             } }, 'ביטול השיבוץ')));
         });
         card.appendChild(det);
+        card.appendChild(el('div', { class: 'row', style: 'margin-top:10px' }, el('button', { class: 'btn small', style: 'border-color:var(--bad);color:var(--bad)', onclick: function () {
+          confirmBox('ביטול כל השיבוצים', 'יוסרו כל ' + mine.length + ' המשמרות של ' + g.name + ' בחודש הזה. המשבצות יתפנו לשיבוץ מחדש.', 'כן, לבטל הכול').then(function (y) {
+            if (y) boardAction('adminUnassignGuide', { month: m.month, guideId: g.id }, 'מבטל…').then(function (x) { if (x) { toast('בוטלו ' + x.removed + ' שיבוצים של ' + g.name); renderAdmin(); } });
+          });
+        } }, '🗑 ביטול כל השיבוצים של ' + g.name + ' (' + mine.length + ')')));
       }
       holder.appendChild(card);
     });
